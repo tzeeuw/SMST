@@ -2,10 +2,19 @@ import subprocess
 import os
 import sys
 import time
+from server_proj.wol import wake_server
 
 # open process
 cmd = [sys.executable, os.getcwd() + "/tests/continous.py"]
 proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, text=False)
+
+
+# early implementation to avoid turning on computer when people are sleeping
+if not 1 < time.hour < 9:
+    wake_server("3C-58-C2-4C-C8-EF", port=9)
+else:
+    print('Too late sorry mate')
+
 
 
 def get_players():
@@ -18,7 +27,7 @@ while True:
     line = proc.stdout.readline()
     line = bytes.decode(line.strip(), "utf-8")
 
-    
+
     print(line)
 
     # placeholder code
