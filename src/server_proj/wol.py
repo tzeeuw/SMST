@@ -1,8 +1,7 @@
-import datetime
 import socket
 
-time = datetime.datetime.now().time()
 
+mac_address_server = "D4-5D-64-3D-13-17"
 
 def wake_server(mac_address, port):
     """Wakes a device with specified mac_address over a specified port using a broadcast of the magic packet.
@@ -14,18 +13,21 @@ def wake_server(mac_address, port):
         port (int): unused port on the local network to send out the broadcast signal
     """
 
+    UDP_IP =  "yep this was definetely here during time of commit"
+    UDP_PORT = port
+
     mac_address = bytes.fromhex(mac_address.replace(":", "").replace("-", ""))
 
     # magic packet consists of a starting ff string followed by 16 x the mac address
-    magic_packet = b'\xFF'*6 + mac_address * 16
+    magic_packet = b"\xFF"*6 + mac_address * 16
 
-    # broadcast packet over the local network
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-
-        sock.sendto(magic_packet, ("<broadcast>", port))
+    # broadcast packet over the local network, SOCK_STREAM to use TCP instead of UDP, more failsafe
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        #sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock.connect((UDP_IP, UDP_PORT))
+        sock.sendall(b"def testing everything")
 
 
 
 if __name__ == "__main__":
-    wake_server("3C-58-C2-4C-C8-EF", port=9)
+    wake_server("D4-5D-64-3D-13-17", port=9090)
