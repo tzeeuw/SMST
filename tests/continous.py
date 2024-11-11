@@ -2,5 +2,7 @@ import time
 
 
 # test code
-for i in range(1000):
-    print('this works')
+print('left')
+while True:
+    #print('test')
+    print(3+3+3)
