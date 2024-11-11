@@ -1,8 +1,9 @@
 import time
-
+import sys
 
 # test code
 print('left')
 while True:
-    #print('test')
-    print(3+3+3)
+    time.sleep(1)
+    print("test")
+    sys.stdout.flush()
