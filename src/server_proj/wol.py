@@ -1,4 +1,5 @@
 import socket
+import struct
 
 
 mac_address_server = "D4-5D-64-3D-13-17"
@@ -13,21 +14,24 @@ def wake_server(mac_address, port):
         port (int): unused port on the local network to send out the broadcast signal
     """
 
-    UDP_IP =  "yep this was definetely here during time of commit"
+    UDP_IP = "192.168.178.255"
     UDP_PORT = port
 
-    mac_address = bytes.fromhex(mac_address.replace(":", "").replace("-", ""))
-
+    mac_address = mac_address.replace(":", "").replace("-", "")
+    mac_hex = bytes.fromhex(mac_address)
+    
     # magic packet consists of a starting ff string followed by 16 x the mac address
-    magic_packet = b"\xFF"*6 + mac_address * 16
+    magic_packet = b"\xff" * 6 + mac_hex * 16
 
-    # broadcast packet over the local network, SOCK_STREAM to use TCP instead of UDP, more failsafe
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        #sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        sock.connect((UDP_IP, UDP_PORT))
-        sock.sendall(b"def testing everything")
+    # broadcast packet over the local network, SOCK_DGRAM so that UDP is used as TCP fails
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+
+        # not needed?
+        # sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        
+        sock.sendto(magic_packet, (UDP_IP, UDP_PORT))
 
 
 
 if __name__ == "__main__":
-    wake_server("D4-5D-64-3D-13-17", port=9090)
+    wake_server("d4:5d:64:3d:13:17", port=9090)
