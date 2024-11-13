@@ -1,6 +1,4 @@
 import socket
-import struct
-
 
 mac_address_server = "D4-5D-64-3D-13-17"
 
@@ -27,11 +25,11 @@ def wake_server(mac_address, port):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
 
         # not needed?
-        # sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         
         sock.sendto(magic_packet, (UDP_IP, UDP_PORT))
 
 
 
 if __name__ == "__main__":
-    wake_server("d4:5d:64:3d:13:17", port=9090)
+    wake_server("d4:5d:64:3d:13:17", port=6942)
