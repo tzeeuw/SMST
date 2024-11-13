@@ -2,23 +2,26 @@ import subprocess
 import os
 import sys
 import time
+import datetime
 from server_proj.wol import wake_server
 
 # open process
-cmd = [sys.executable, os.getcwd() + "/tests/continous.py"]
+cmd = ["java", "Xms1G", "Xmx2G", "server.jar", "--no-gui"]
 proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, text=False)
 
 
-# early implementation to avoid turning on computer when people are sleeping
-if not 1 < time.hour < 9:
-    wake_server("3C-58-C2-4C-C8-EF", port=9)
-else:
-    print('Too late sorry mate')
-
-
-
 def get_players():
-    return 0
+    proc.stdin.write("list players")
+    line = proc.stdout.readline()
+    players = len(line)
+    return players
+
+
+def init_shutdown():
+    proc.stdin.write("exit")
+
+
+# put entire code in class? when server is down -> create new class instance to activate
 
 # test code to see if everything works
 while True:
@@ -27,7 +30,6 @@ while True:
     line = proc.stdout.readline()
     line = bytes.decode(line.strip(), "utf-8")
 
-
     print(line)
 
     # placeholder code
@@ -35,12 +37,21 @@ while True:
         print('test players')
         if get_players() == 0:
             current_time = time.time()
+            shutdown = True
+
+    elif "joined" in line:
+        shutdown = False
 
     # some early code
-    if time.time() - current_time > 5 and get_players() == 0:
-        print("THIS DOES WORK")
-        proc.terminate()
+    if time.time() - current_time > 10 and shutdown:
+        if get_players == 0:
+            init_shutdown()
+            break
+        else:
+            shutdown = False
+
+
+    if  not 1 < datetime.datetime.now().hour < 9:
+        init_shutdown()
         break
-
-
 

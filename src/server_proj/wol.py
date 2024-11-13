@@ -17,7 +17,7 @@ def wake_server(mac_address, port):
 
     mac_address = mac_address.replace(":", "").replace("-", "")
     mac_hex = bytes.fromhex(mac_address)
-    
+
     # magic packet consists of a starting ff string followed by 16 x the mac address
     magic_packet = b"\xff" * 6 + mac_hex * 16
 
@@ -32,4 +32,10 @@ def wake_server(mac_address, port):
 
 
 if __name__ == "__main__":
-    wake_server("d4:5d:64:3d:13:17", port=6942)
+
+    time_now = datetime.datetime.now()
+    # early implementation to avoid turning on computer when people are sleeping
+    if not 1 < time_now.hour < 9:
+        wake_server("3C-58-C2-4C-C8-EF", port=9)
+    else:
+        print('Too late sorry mate')
