@@ -1,6 +1,4 @@
 import subprocess
-import os
-import sys
 import time
 import datetime
 from server_proj.wol import wake_server
