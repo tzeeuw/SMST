@@ -1,0 +1,1 @@
+print(next(filter(str.isdigit, "0 4 2")))
