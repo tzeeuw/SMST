@@ -4,13 +4,44 @@ import datetime
 from server_proj.wol import wake_server
 
 import os
+import re
+
+
+
+
+directory = "D:\\Minecraft\\Minecraft_server"
+cmd = "start.bat"
+
+# opens a .bat file from a specified working directory (cwd), links input/output/errors to PIPE to be able to read and write, bufsize=1 will mean that every write ended with a "\n" termination character
+# will be flushed to the PIPE (thus being excecuted), shell is required to open the process and text=true removes the need of decoding the input and output strings.
+proc = subprocess.Popen(cmd, cwd=directory, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, text=True, bufsize=1)
 
 
 
 
 
+def get_player_count():
+    proc.stdin.write("/list\n")
+    # proc.stdin.flush()
+    line = proc.stdout.readline().strip()
+    print(line)
+    player_count = re.search(r'\d+', line).group()
+
+    return player_count
 
 
+while True:
+    line = proc.stdout.readline().strip()
+    print(line)
+
+    if "joined" in line:
+        print("test")
+        time.sleep(5)
+        proc.stdin.write("say hello\n")
+        # proc.stdin.flush()
+        print("test2")
+        time.sleep(1)
+        print(get_player_count())
 
 # STARTING FROM SCRATCH
 
