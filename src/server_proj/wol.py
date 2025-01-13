@@ -1,7 +1,6 @@
 import socket
 import datetime
 
-
 mac_address_server = "D4-5D-64-3D-13-17"
 
 def wake_server(mac_address, port):
@@ -14,7 +13,7 @@ def wake_server(mac_address, port):
         port (int): unused port on the local network to send out the broadcast signal
     """
 
-    UDP_IP = "192.168.178.255"
+    UDP_IP = f"192.168.178.255"
     UDP_PORT = port
 
     mac_address = mac_address.replace(":", "").replace("-", "")
@@ -27,8 +26,8 @@ def wake_server(mac_address, port):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
 
         # not needed?
-        # sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        
         sock.sendto(magic_packet, (UDP_IP, UDP_PORT))
 
 
@@ -38,6 +37,6 @@ if __name__ == "__main__":
     time_now = datetime.datetime.now()
     # early implementation to avoid turning on computer when people are sleeping
     if not 1 < time_now.hour < 9:
-        wake_server("3C-58-C2-4C-C8-EF", port=9)
+        wake_server("D4-5D-64-3D-13-17", port=42069)
     else:
         print('Too late sorry mate')
