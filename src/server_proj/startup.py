@@ -4,6 +4,7 @@ import datetime
 from server_proj.wol import wake_server
 import socket
 from contextlib import closing
+import threading
 
 import os
 import re
@@ -12,10 +13,8 @@ import re
 class mc_server():
     def __init__(self):
         self._server_is_alive = False
-        self.idle_loop()
-
     def server_start(self):
-        directory = "C:\\Users\\Thijs\\Minecraft_server"
+        directory = "D:\\Minecraft\\Minecraft_server"
         cmd = "start.bat"
 
         # opens a .bat file from a specified working directory (cwd), links input/output/errors to PIPE to be able to read and write, bufsize=1 will mean that every write ended with a "\n" termination character
@@ -27,17 +26,47 @@ class mc_server():
 
     def server_stop(self):
         self.proc.stdin.write("stop\n")
+        for line in self.proc.stdout.readlines():
+            print(line)
         time.sleep(10)
         self.idle_loop()
 
 
     def server_loop(self):
+        thread = threading.Thread(target=self.server_countdown)
+        self.shutdown_server = False
+
         while True:
             line = self.proc.stdout.readline().strip()
             print(line)
 
             if "left" in line:
-                print(self.get_player_count())
+                if self.get_player_count() == 0 and not thread.is_alive():
+                    thread.start()
+
+            if "joined" in line and thread.is_alive():
+                self.kill_thread = True
+                thread.join()
+                print("thread broken")
+
+                thread = threading.Thread(target=self.server_countdown)
+
+            if self.shutdown_server:
+                self.server_stop()
+
+
+    def server_countdown(self):
+        self.kill_thread = False
+
+        for _ in range(10):
+            time.sleep(1)
+            print(_)
+            if self.kill_thread:
+                return
+
+        print("server is stopping")
+        self.proc.stdin.write("say Server is shutting down\n")
+        self.shutdown_server = True
 
 
     def idle_loop(self):
@@ -67,8 +96,9 @@ class mc_server():
         line = self.proc.stdout.readline().strip()
         player_count = re.search(r'\d+', line).group()
 
-        return player_count
+        return 0
 
 
 if __name__ == "__main__":
-    mc_server()
+    server = mc_server()
+    server.server_start()
