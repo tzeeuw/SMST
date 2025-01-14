@@ -94,9 +94,9 @@ class mc_server():
 
         self.proc.stdin.write("/list\n")
         line = self.proc.stdout.readline().strip()
-        player_count = re.search(r'\d+', line).group()
+        player_count = line[line.index("of max")-2] # very rudementairy should change it to be more rigorous
 
-        return 0
+        return player_count
 
 
 if __name__ == "__main__":
