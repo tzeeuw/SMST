@@ -13,6 +13,7 @@ import re
 class mc_server():
     def __init__(self):
         self._server_is_alive = False
+        
     def server_start(self):
         directory = "D:\\Minecraft\\Minecraft_server"
         cmd = "start.bat"
@@ -41,7 +42,7 @@ class mc_server():
             print(line)
 
             if "left" in line:
-                if self.get_player_count() == 0 and not thread.is_alive():
+                if int(self.get_player_count()) == 0 and not thread.is_alive():
                     thread.start()
 
             if "joined" in line and thread.is_alive():
@@ -94,7 +95,8 @@ class mc_server():
 
         self.proc.stdin.write("/list\n")
         line = self.proc.stdout.readline().strip()
-        player_count = line[line.index("of max")-2] # very rudementairy should change it to be more rigorous
+        print(line)
+        player_count = line[line.index("of a max")-2] # very rudementairy should change it to be more rigorous
 
         return player_count
 

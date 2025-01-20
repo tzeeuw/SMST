@@ -1,12 +1,7 @@
 import socket
 from contextlib import closing
-import time
-import datetime
 from server_proj import wol
-import pyshark
 
-
-# checks if port is open or not
 
 
 # filters mean only unique tcp requests to a port will be captured and retransmissions/icmp (return messages) will be ignored
@@ -32,38 +27,55 @@ import pyshark
     
 #     print(ip_address)
 
+
 IP =  "yep this was definetely here during time of commit"
 PORT = 42070
 
+maintenance = False
 
-class proxy_server():
-    def __init__(self):
-        pass
+def port_check(_IP=IP, _PORT=PORT):
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+        sock.settimeout(5)
+        result = sock.connect_ex((IP, PORT))
+        return result
 
-    def port_check():
-        with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-            sock.settimeout(10)
-            result = sock.connect_ex(('192.168.178.17', 25565))
-            return result
 
-    def send_request(self):
+
+def status():
+    result = port_check(IP, PORT)
+
+    print(result)
+
+    if result==0:
+        return "Online"
+
+    elif not maintenance:
+        result = port_check(IP, 42070)
+
+        if result==0:
+            return "Idling"
         
-        with closing(socket.socket()) as sock:
-            packet = "Alive?"
-
-            sock.connect((IP, PORT))
-            sock.send(packet.encode())
-
-            answer = sock.recv(1024).decode()
-            print(answer)
-
-            if answer == "yes":
-                print("server is alive")
-
-            else:
-                print("server starting")
+        else:
+            return "Sleeping"
+        
+    else:
+        return "Offline"
 
 
-if __name__ == "__main__":
-    proxy = proxy_server()
-    proxy.send_request()
+def send_request():
+    
+    with closing(socket.socket()) as sock:
+        packet = "Alive?"
+
+        sock.connect((IP, PORT))
+        sock.send(packet.encode())
+
+        answer = sock.recv(1024).decode()
+        print(answer)
+
+        if answer == "yes":
+            print("server is alive")
+
+        else:
+            print("server starting")
+

@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     time_now = datetime.datetime.now()
     # early implementation to avoid turning on computer when people are sleeping
-    if not 1 < time_now.hour < 9:
+    if not 2 < time_now.hour < 9:
         wake_server("D4-5D-64-3D-13-17", port=42069)
     else:
         print('Too late sorry mate')
