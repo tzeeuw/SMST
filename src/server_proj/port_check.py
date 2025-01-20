@@ -2,7 +2,7 @@ import socket
 from contextlib import closing
 import time
 import datetime
-from server_proj import wol
+# from server_proj import wol
 import pyshark
 
 
@@ -10,60 +10,60 @@ import pyshark
 
 
 # filters mean only unique tcp requests to a port will be captured and retransmissions/icmp (return messages) will be ignored
-# capture = pyshark.LiveCapture('Ethernet', display_filter="tcp.port == 25565 and not tcp.analysis.retransmission and not icmp")
-# first_call = False
+capture = pyshark.LiveCapture('eth0', display_filter="tcp.port == 25565 and not tcp.analysis.retransmission and not icmp")
+first_call = False
 
-# for packet in capture.sniff_continuously():
-#     print(packet.ip.src)
+for packet in capture.sniff_continuously():
+    print(packet.ip.src)
 
-#     if not first_call:
-#         ip_address = packet.ip.src
-#         recieve_time = datetime.datetime.now()
-#         first_call = True
+    if not first_call:
+        ip_address = packet.ip.src
+        recieve_time = datetime.datetime.now()
+        first_call = True
 
-#     elif packet.ip.src == ip_address:
-#         print('test')
-#         first_call = False
-#         break
+    elif packet.ip.src == ip_address:
+        print('test')
+        first_call = False
+        break
 
-#     elif datetime.datetime.now() - recieve_time > 30:
-#         first_call = False
-#         ip_address = 0
+    elif datetime.datetime.now() - recieve_time > 30:
+        first_call = False
+        ip_address = 0
     
-#     print(ip_address)
+    print(ip_address)
 
-IP =  "yep this was definetely here during time of commit"
-PORT = 42070
+# IP =  "yep this was definetely here during time of commit"
+# PORT = 42070
 
 
-class proxy_server():
-    def __init__(self):
-        pass
+# class proxy_server():
+#     def __init__(self):
+#         pass
 
-    def port_check():
-        with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-            sock.settimeout(10)
-            result = sock.connect_ex(('192.168.178.17', 25565))
-            return result
+#     def port_check():
+#         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+#             sock.settimeout(10)
+#             result = sock.connect_ex(('192.168.178.17', 25565))
+#             return result
 
-    def send_request(self):
+#     def send_request(self):
         
-        with closing(socket.socket()) as sock:
-            packet = "Alive?"
+#         with closing(socket.socket()) as sock:
+#             packet = "Alive?"
 
-            sock.connect((IP, PORT))
-            sock.send(packet.encode())
+#             sock.connect((IP, PORT))
+#             sock.send(packet.encode())
 
-            answer = sock.recv(1024).decode()
-            print(answer)
+#             answer = sock.recv(1024).decode()
+#             print(answer)
 
-            if answer == "yes":
-                print("server is alive")
+#             if answer == "yes":
+#                 print("server is alive")
 
-            else:
-                print("server starting")
+#             else:
+#                 print("server starting")
 
 
-if __name__ == "__main__":
-    proxy = proxy_server()
-    proxy.send_request()
+# if __name__ == "__main__":
+#     proxy = proxy_server()
+#     proxy.send_request()
