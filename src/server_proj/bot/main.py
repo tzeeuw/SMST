@@ -6,11 +6,9 @@ import datetime
 import server_proj.com.port_check as portcheck
 
 
-
 GUILD_ID = discord.Object(id= 'Totally did not commit sensitive information here :)')
 intents = discord.Intents.default()
 intents.message_content = True
-
 
 
 # first value is string for discord, second is colour of embed

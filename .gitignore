@@ -172,3 +172,15 @@ server_proj/bin/pip3.11
 server_proj/bin/python
 server_proj/bin/python3
 server_proj/bin/python3.11
+server_venv/lib64
+server_venv/pyvenv.cfg
+server_venv/bin/activate
+server_venv/bin/activate.csh
+server_venv/bin/activate.fish
+server_venv/bin/Activate.ps1
+server_venv/bin/pip
+server_venv/bin/pip3
+server_venv/bin/pip3.11
+server_venv/bin/python
+server_venv/bin/python3
+server_venv/bin/python3.11

@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 pyshark = "^0.6"
+discord = "^2.3.2"
 
 [tool.poetry.scripts]
 

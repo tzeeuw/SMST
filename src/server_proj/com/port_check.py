@@ -92,7 +92,3 @@ def start(prot="sleeping"):
     
 
 
-
-
-if __name__ == "__main__":
-    send_request()
