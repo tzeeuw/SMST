@@ -4,6 +4,7 @@ import datetime
 import socket
 from contextlib import closing
 import threading
+import os
 
 
 class mc_server():
@@ -25,7 +26,12 @@ class mc_server():
         self.proc.stdin.write("stop\n")
         for line in self.proc.stdout.readlines():
             print(line.split())
-        self.idle_loop(t_sec=30)
+
+        if MANUAL_START:
+            self.idle_loop(t_sec=0)
+        
+        else:
+            self.idle_loop(t_sec=30)
 
 
 
@@ -37,7 +43,7 @@ class mc_server():
             line = self.proc.stdout.readline().strip()
             print(line)
 
-            if "left" in line:
+            if "left" in line or "pause" in line:
                 if int(self.get_player_count()) == 0 and not thread.is_alive():
                     thread.start()
 
@@ -101,15 +107,15 @@ class mc_server():
                 message = proxy_socket.recv(1024).decode()
 
                 if message=="start server":
-                    if t_sec:
+                    if not MANUAL_START:
                         if thread.is_alive():
                             self.kill_thread=True
                             thread.join()
                     break
 
-                if message=="shutdown":
+                if message=="shutdown" and not MANUAL_START:
+                    os.system('shutdown -s')
                     exit()
-            
 
         self.server_start()
 
@@ -142,10 +148,15 @@ with closing(socket.socket()) as sock:
         print(response)
 
         if response=="yes":
+
+            MANUAL_START=False
             server = mc_server()
             server.server_start()
 
     else:
         print("Not starting server, but idling")
+
+        # if pc is manually started to not shutdown or leave the idle loop
+        MANUAL_START=True
         server = mc_server()
         server.idle_loop(t_sec=0)
