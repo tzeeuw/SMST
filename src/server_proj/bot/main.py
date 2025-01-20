@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+import datetime
 
 import server_proj.com.port_check as portcheck
 
@@ -28,21 +29,25 @@ class ServerGroup(app_commands.Group):
     async def start(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        match portcheck.status():
-            case "online":
-                await interaction.followup.send("Server is already online")
+        if 2 < datetime.datetime.now().hour < 9:
+            await interaction.followup.send("Sorry mate it is too late")
 
-            case "idling":
-                await interaction.followup.send("Server is starting")
-                portcheck.start("idling")
+        else:
+            match portcheck.status():
+                case "online":
+                    await interaction.followup.send("Server is already online")
 
-            case "sleeping":
-                await interaction.followup.send("Server is waking up and starting.")
-                portcheck.start("sleeping")
+                case "idling":
+                    await interaction.followup.send("Server is starting")
+                    portcheck.start("idling")
+
+                case "sleeping":
+                    await interaction.followup.send("Server is waking up and starting.")
+                    portcheck.start("sleeping")
 
 
-            case "offline":
-                await interaction.followup.send("Server is offline due to maintenance")
+                case "offline":
+                    await interaction.followup.send("Server is offline due to maintenance")
 
 
     @app_commands.command(description="Status checker for the server")
