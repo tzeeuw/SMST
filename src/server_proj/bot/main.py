@@ -14,10 +14,10 @@ intents.message_content = True
 
 # first value is string for discord, second is colour of embed
 status_dict = {
-    "Online": [str(""":white_check_mark: ```ansi\n\033[0;32mOnline```"""), discord.Colour.green()],
-    "Idling": [str(""":hourglass_flowing_sand: ```prolog\nIdling```"""), discord.Colour.yellow()],
-    "Sleeping": [str(""":zzz::zzz::zzz:```fix\nSleeping```"""), discord.Colour.blue()],
-    "Offline": [str(""":x: ```ml\nOffline```"""), discord.Colour.red()]
+    "online": [str(""":white_check_mark: ```ansi\n\033[0;32mOnline```"""), discord.Colour.green()],
+    "idling": [str(""":hourglass_flowing_sand: ```prolog\nIdling```"""), discord.Colour.yellow()],
+    "sleeping": [str(""":zzz::zzz::zzz:```fix\nSleeping```"""), discord.Colour.blue()],
+    "offline": [str(""":x: ```ml\nOffline```"""), discord.Colour.red()]
     }
 
 
@@ -29,21 +29,20 @@ class ServerGroup(app_commands.Group):
         await interaction.response.defer()
 
         match portcheck.status():
-            case "Online":
-                await interaction.response.send_message("Server is already online")
-                return 
-        
-            case "Idling":
-                await interaction.response.send_message("Server is starting")
-                return
+            case "online":
+                await interaction.followup.send("Server is already online")
 
-            case "Sleeping":
-                await interaction.response.send_message("Server is waking up and starting.")
-                return
+            case "idling":
+                await interaction.followup.send("Server is starting")
+                portcheck.start("idling")
 
-            case "Offline":
-                await interaction.response.send_message("Server is offline due to maintenance")
-                return
+            case "sleeping":
+                await interaction.followup.send("Server is waking up and starting.")
+                portcheck.start("sleeping")
+
+
+            case "offline":
+                await interaction.followup.send("Server is offline due to maintenance")
 
 
     @app_commands.command(description="Status checker for the server")
