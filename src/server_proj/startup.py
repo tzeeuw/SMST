@@ -15,7 +15,7 @@ class mc_server():
         self._server_is_alive = False
         
     def server_start(self):
-        directory = "D:\\Minecraft\\Minecraft_server"
+        directory = "C:\\Users\\Thijs\\Minecraft_server"
         cmd = "start.bat"
 
         # opens a .bat file from a specified working directory (cwd), links input/output/errors to PIPE to be able to read and write, bufsize=1 will mean that every write ended with a "\n" termination character
@@ -28,7 +28,7 @@ class mc_server():
     def server_stop(self):
         self.proc.stdin.write("stop\n")
         for line in self.proc.stdout.readlines():
-            print(line)
+            print(line.split())
         time.sleep(10)
         self.idle_loop()
 
@@ -53,8 +53,9 @@ class mc_server():
                 thread = threading.Thread(target=self.server_countdown)
 
             if self.shutdown_server:
-                self.server_stop()
-
+                break
+                
+        self.server_stop()
 
     def server_countdown(self):
         self.kill_thread = False
@@ -71,24 +72,27 @@ class mc_server():
 
 
     def idle_loop(self):
-        with socket.socket() as sock:
+
+        with closing(socket.socket()) as sock:
             sock.bind(( "yep this was definetely here during time of commit", 42070))
-            sock.listen()
 
-            (proxy_socket, proxy_address) = sock.accept()
-            message = proxy_socket.recv(1024).decode()
+            while True:
+                sock.listen()
 
-            print(message)
+                (proxy_socket, proxy_address) = sock.accept()
+                message = proxy_socket.recv(1024).decode()
 
-            if message == "Alive?":
-                if self._server_is_alive:
-                    proxy_socket.send("yes".encode())
+                print(message)
 
-                else:
-                    proxy_socket.send("no".encode())
-                    proxy_socket.close()
-                    sock.close()
-                    self.server_start()
+                if message == "Alive?":
+                    if self._server_is_alive:
+                        proxy_socket.send("yes".encode())
+
+                    else:
+                        proxy_socket.send("no".encode())
+                        proxy_socket.close()
+                        sock.close()
+                        self.server_start()
 
         
     def get_player_count(self):
