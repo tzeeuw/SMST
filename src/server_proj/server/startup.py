@@ -25,12 +25,12 @@ class mc_server():
         self.proc.stdin.write("stop\n")
         for line in self.proc.stdout.readlines():
             print(line.split())
-        time.sleep(10)
-        self.idle_loop()
+        self.idle_loop(t_sec=30)
+
 
 
     def server_loop(self):
-        thread = threading.Thread(target=self.server_countdown)
+        thread = threading.Thread(target=self.server_countdown, args=(10,))
         self.shutdown_server = False
 
         while True:
@@ -46,19 +46,21 @@ class mc_server():
                 thread.join()
                 print("thread broken")
 
-                thread = threading.Thread(target=self.server_countdown)
+                thread = threading.Thread(target=self.server_countdown, args=(10,))
 
             if self.shutdown_server:
                 break
                 
         self.server_stop()
 
-    def server_countdown(self):
+
+
+    def server_countdown(self, t_sec):
         self.kill_thread = False
 
-        for _ in range(10):
+        for t in range(t_sec):
             time.sleep(1)
-            print(_)
+            print(t)
             if self.kill_thread:
                 return
 
@@ -67,7 +69,27 @@ class mc_server():
         self.shutdown_server = True
 
 
-    def idle_loop(self):
+    def shutdown_countdown(self, t_sec):
+        self.kill_thread = False
+
+        for t in range(t_sec):
+            time.sleep(1)
+            print(t)
+            if self.kill_thread:
+                return
+
+        with closing(socket.socket()) as sock:
+            sock.connect(( "yep this was definetely here during time of commit", 42070))
+            sock.send("shutdown".encode())
+
+
+
+    def idle_loop(self, t_sec=0):
+
+        if t_sec:
+            thread = threading.Thread(target=self.shutdown_countdown, args=(t_sec,))
+            thread.start()
+
 
         with closing(socket.socket()) as sock:
             sock.bind(( "yep this was definetely here during time of commit", 42070))
@@ -78,17 +100,18 @@ class mc_server():
                 (proxy_socket, proxy_address) = sock.accept()
                 message = proxy_socket.recv(1024).decode()
 
-                print(message)
+                if message=="start server":
+                    if t_sec:
+                        if thread.is_alive():
+                            self.kill_thread=True
+                            thread.join()
+                    break
 
-                if message == "Alive?":
-                    if self._server_is_alive:
-                        proxy_socket.send("yes".encode())
+                if message=="shutdown":
+                    exit()
+            
 
-                    else:
-                        proxy_socket.send("no".encode())
-                        proxy_socket.close()
-                        sock.close()
-                        self.server_start()
+        self.server_start()
 
         
     def get_player_count(self):
@@ -101,6 +124,28 @@ class mc_server():
         return player_count
 
 
-if __name__ == "__main__":
-    server = mc_server()
-    server.server_start()
+
+# if __name__ == "__main__":
+#     server = mc_server()
+#     server.idle_loop(t_sec=30)
+
+
+with closing(socket.socket()) as sock:
+    sock.settimeout(10)
+    result = sock.connect_ex((("192.168.178.17", 42070)))
+
+    if result==0:
+        sock.send("wake up?".encode())
+
+        response = sock.recv(1024).decode()
+
+        print(response)
+
+        if response=="yes":
+            server = mc_server()
+            server.server_start()
+
+    else:
+        print("Not starting server, but idling")
+        server = mc_server()
+        server.idle_loop(t_sec=0)
