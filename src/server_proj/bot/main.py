@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-import server_proj.port_check as portcheck
+import server_proj.com.port_check as portcheck
 
 
 
@@ -14,7 +14,7 @@ intents.message_content = True
 
 # first value is string for discord, second is colour of embed
 status_dict = {
-    "Online": [str(""":white_check_mark: ```ansi\n \033[0;32mOnline```"""), discord.Colour.green()],
+    "Online": [str(""":white_check_mark: ```ansi\n\033[0;32mOnline```"""), discord.Colour.green()],
     "Idling": [str(""":hourglass_flowing_sand: ```prolog\nIdling```"""), discord.Colour.yellow()],
     "Sleeping": [str(""":zzz::zzz::zzz:```fix\nSleeping```"""), discord.Colour.blue()],
     "Offline": [str(""":x: ```ml\nOffline```"""), discord.Colour.red()]

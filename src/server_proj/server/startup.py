@@ -1,19 +1,15 @@
 import subprocess
 import time
 import datetime
-from server_proj.wol import wake_server
 import socket
 from contextlib import closing
 import threading
-
-import os
-import re
 
 
 class mc_server():
     def __init__(self):
         self._server_is_alive = False
-        
+
     def server_start(self):
         directory = "C:\\Users\\Thijs\\Minecraft_server"
         cmd = "start.bat"

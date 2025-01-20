@@ -34,23 +34,22 @@ PORT = 42070
 maintenance = False
 
 def port_check(_IP=IP, _PORT=PORT):
-    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+
+    with closing(socket.socket()) as sock:
         sock.settimeout(5)
-        result = sock.connect_ex((IP, PORT))
+        result = sock.connect_ex((_IP, _PORT))
         return result
 
 
 
 def status():
-    result = port_check(IP, PORT)
-
-    print(result)
+    result = port_check(IP, 25565)
 
     if result==0:
         return "Online"
 
     elif not maintenance:
-        result = port_check(IP, 42070)
+        result = port_check(IP, PORT)
 
         if result==0:
             return "Idling"
@@ -79,3 +78,5 @@ def send_request():
         else:
             print("server starting")
 
+if __name__ == "__main__":
+    send_request()
