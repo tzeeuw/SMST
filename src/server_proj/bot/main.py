@@ -6,7 +6,7 @@ import datetime
 import server_proj.com.port_check as portcheck
 
 
-GUILD_ID = discord.Object(id= 'Totally did not commit sensitive information here :)')
+GUILD_ID = [discord.Object(id= 'Totally did not commit sensitive information here :)'), discord.Object(id= 'Here too maybe perhaps :*)')]
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -37,11 +37,12 @@ class ServerGroup(app_commands.Group):
 
                 case "idling":
                     await interaction.followup.send("Server is starting")
-                    portcheck.start("idling")
+                    portcheck.start(prot="idling")
 
                 case "sleeping":
                     await interaction.followup.send("Server is waking up and starting.")
-                    portcheck.start("sleeping")
+
+                    portcheck.start(prot="sleeping")
 
 
                 case "offline":
@@ -60,6 +61,13 @@ class ServerGroup(app_commands.Group):
         await interaction.followup.send(embed=embed)
 
 
+    @app_commands.command(description="retrieves the server IP")
+    async def ip(self, interaction: discord.Interaction):
+        embed = discord.Embed(title="", description="", color=discord.Color.blurple())
+        embed.add_field(name="IP:", value="shieldbois.serveminecraft.net")
+
+        await interaction.response.send_message(embed=embed)
+
 
 
 test_client = commands.Bot(command_prefix="/", intents=intents)
@@ -73,14 +81,15 @@ async def on_ready():
 
     test_client.tree.add_command(server_group)
 
-    test_client.tree.copy_global_to(guild=GUILD_ID)
+    for guild in GUILD_ID:
+        test_client.tree.copy_global_to(guild=guild)
 
-    try:
-        synced = await test_client.tree.sync(guild=GUILD_ID)
-        print(f'Synced {len(synced)} commands to guild {GUILD_ID.id}')
-    
-    except Exception as e:
-        print(f"Error syncing commands; {e}")
+        try:
+            synced = await test_client.tree.sync(guild=guild)
+            print(f'Synced {len(synced)} commands to guild {guild.id}')
+        
+        except Exception as e:
+            print(f"Error syncing commands; {e}")
 
 
 TOKEN= 'Totally did not commit sensitive information here :)'

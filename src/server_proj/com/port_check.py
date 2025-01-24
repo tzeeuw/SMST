@@ -1,7 +1,7 @@
 import socket
 from contextlib import closing
 from server_proj.com.wol import wake_server
-
+import threading
 
 
 
@@ -10,9 +10,10 @@ PORT = 42070
 
 maintenance = False
 
+
 def port_check(_IP=IP, _PORT=PORT):
     with closing(socket.socket()) as sock:
-        sock.settimeout(5)
+        sock.settimeout(3)
         result = sock.connect_ex((_IP, _PORT))
         return result
 
@@ -56,7 +57,31 @@ def send_request():
             print("server starting")
 
 
-def start(prot="sleeping"):
+def start(prot=None):
+    try:
+        alive = thread.is_alive()
+        print(alive)
+
+        if alive:
+            print("thread is alive")
+            return
+        else:
+            create_thread(prot)
+            thread.start()
+
+    except NameError:
+        print("thread is not yet made")
+        create_thread(prot)
+        thread.start()
+
+
+
+def create_thread(prot=None):
+    global thread
+    thread = threading.Thread(target=start_thread, args=(prot,))
+
+
+def start_thread(prot=None):
     if prot=="idling":
         with closing(socket.socket()) as sock:
             packet = "start server"
@@ -71,11 +96,12 @@ def start(prot="sleeping"):
             sock.send(packet.encode())
         
 
+    # FIX: if waiting for connect but pc wont start
     elif prot=="sleeping":
         wake_server()
 
         with closing(socket.socket()) as sock:
-            sock.bind(("192.168.178.17", PORT))
+            sock.bind(( "and this one too", PORT))
 
             sock.listen()
             
