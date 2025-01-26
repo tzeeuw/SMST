@@ -64,10 +64,15 @@ class ServerGroup(app_commands.Group):
     @app_commands.command(description="retrieves the server IP")
     async def ip(self, interaction: discord.Interaction):
         embed = discord.Embed(title="", description="", color=discord.Color.blurple())
-        embed.add_field(name="IP:", value="shieldbois.serveminecraft.net")
+        embed.add_field(name="IP:", value="[modpac](shieldbois.serveminecraft.net)")
 
         await interaction.response.send_message(embed=embed)
 
+
+    @app_commands.command(description="get modpack of the server")
+    async def modpack(self, interaction: discord.Interaction):
+        embed = discord.Embed(title="", description="", color=discord.Color.brand_green())
+        embed.add_field(name="Modpack: ", value="https://drive.google.com/file/d/1q_kgWmKOmKaP6QQXv3OPk1Vf5viNu7og/view?usp=drive_link")
 
 
 test_client = commands.Bot(command_prefix="/", intents=intents)
