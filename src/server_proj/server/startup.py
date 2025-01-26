@@ -31,12 +31,12 @@ class mc_server():
             self.idle_loop(t_sec=0)
         
         else:
-            self.idle_loop(t_sec=30)
+            self.idle_loop(t_sec=5*60)
 
 
 
     def server_loop(self):
-        thread = threading.Thread(target=self.server_countdown, args=(10,))
+        thread = threading.Thread(target=self.server_countdown, args=(10*60,))
         self.shutdown_server = False
 
         while True:
@@ -52,7 +52,7 @@ class mc_server():
                 thread.join()
                 print("thread broken")
 
-                thread = threading.Thread(target=self.server_countdown, args=(10,))
+                thread = threading.Thread(target=self.server_countdown, args=(10*60,))
 
             if self.shutdown_server:
                 break
@@ -138,7 +138,7 @@ class mc_server():
 
 with closing(socket.socket()) as sock:
     sock.settimeout(10)
-    result = sock.connect_ex((("192.168.178.17", 42070)))
+    result = sock.connect_ex((( "and this one too", 42070)))
 
     if result==0:
         sock.send("wake up?".encode())
