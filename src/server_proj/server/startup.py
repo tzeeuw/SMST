@@ -43,7 +43,7 @@ class mc_server():
             line = self.proc.stdout.readline().strip()
             print(line)
 
-            if "left" in line or "pause" in line:
+            if "left" in line or "pausing" in line:
                 if int(self.get_player_count()) == 0 and not thread.is_alive():
                     thread.start()
 
@@ -138,7 +138,7 @@ class mc_server():
 
 with closing(socket.socket()) as sock:
     sock.settimeout(10)
-    result = sock.connect_ex((("192.168.178.17", 42070)))
+    result = sock.connect_ex((( "and this one too", 42070)))
 
     if result==0:
         sock.send("wake up?".encode())
