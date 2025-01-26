@@ -74,6 +74,8 @@ class ServerGroup(app_commands.Group):
         embed = discord.Embed(title="", description="", color=discord.Color.brand_green())
         embed.add_field(name="Modpack: ", value="[Mod pack](https://drive.google.com/file/d/1q_kgWmKOmKaP6QQXv3OPk1Vf5viNu7og/view?usp=drive_link)")
 
+        await interaction.response.send_message(embed=embed)
+
 
 test_client = commands.Bot(command_prefix="/", intents=intents)
 server_group = ServerGroup(name="server", description="Handles server")
