@@ -27,26 +27,23 @@ class ServerGroup(app_commands.Group):
     async def start(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        if 2 < datetime.datetime.now().hour < 9:
-            await interaction.followup.send("Sorry mate it is too late")
 
-        else:
-            match portcheck.status():
-                case "online":
-                    await interaction.followup.send("Server is already online")
+        match portcheck.status():
+            case "online":
+                await interaction.followup.send("Server is already online")
 
-                case "idling":
-                    await interaction.followup.send("Server is starting")
-                    portcheck.start(prot="idling")
+            case "idling":
+                await interaction.followup.send("Server is starting")
+                portcheck.start(prot="idling")
 
-                case "sleeping":
-                    await interaction.followup.send("Server is waking up and starting.")
+            case "sleeping":
+                await interaction.followup.send("Server is waking up and starting.")
 
-                    portcheck.start(prot="sleeping")
+                portcheck.start(prot="sleeping")
 
 
-                case "offline":
-                    await interaction.followup.send("Server is offline due to maintenance")
+            case "offline":
+                await interaction.followup.send("Server is offline due to maintenance")
 
 
     @app_commands.command(description="Status checker for the server")
