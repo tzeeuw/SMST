@@ -69,9 +69,12 @@ class ServerGroup(app_commands.Group):
     @app_commands.command(description="get modpack of the server")
     async def modpack(self, interaction: discord.Interaction):
         embed = discord.Embed(title="", description="", color=discord.Color.brand_green())
-        embed.add_field(name="Modpack: ", value="[Mod pack](https://drive.google.com/file/d/1q_kgWmKOmKaP6QQXv3OPk1Vf5viNu7og/view?usp=drive_link)")
-
+        embed.add_field(name="Modpack: ", value="The base mod pack can be downloaded from [Mod pack](https://drive.google.com/file/d/1q_kgWmKOmKaP6QQXv3OPk1Vf5viNu7og/view?usp=drive_link)\
+            \n to update the mod pack, download [update](https://drive.google.com/file/d/1H2I8OAYV1_dbler4g4kb-2j8bEycJEwl/view?usp=drive_link) and copy the files into the mods folder.")
+        
         await interaction.response.send_message(embed=embed)
+
+
 
 
 test_client = commands.Bot(command_prefix="/", intents=intents)
