@@ -12,7 +12,7 @@ class mc_server():
         self._server_is_alive = False
 
     def server_start(self):
-        directory = "C:\\Users\\Thijs\\Minecraft_server"
+        directory = "C:\\Users\\Thijs\\Minecraft_server\\modded"
         cmd = "start.bat"
 
         # opens a .bat file from a specified working directory (cwd), links input/output/errors to PIPE to be able to read and write, bufsize=1 will mean that every write ended with a "\n" termination character
