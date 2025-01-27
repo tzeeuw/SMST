@@ -27,26 +27,23 @@ class ServerGroup(app_commands.Group):
     async def start(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        if 2 < datetime.datetime.now().hour < 9:
-            await interaction.followup.send("Sorry mate it is too late")
 
-        else:
-            match portcheck.status():
-                case "online":
-                    await interaction.followup.send("Server is already online")
+        match portcheck.status():
+            case "online":
+                await interaction.followup.send("Server is already online")
 
-                case "idling":
-                    await interaction.followup.send("Server is starting")
-                    portcheck.start(prot="idling")
+            case "idling":
+                await interaction.followup.send("Server is starting")
+                portcheck.start(prot="idling")
 
-                case "sleeping":
-                    await interaction.followup.send("Server is waking up and starting.")
+            case "sleeping":
+                await interaction.followup.send("Server is waking up and starting.")
 
-                    portcheck.start(prot="sleeping")
+                portcheck.start(prot="sleeping")
 
 
-                case "offline":
-                    await interaction.followup.send("Server is offline due to maintenance")
+            case "offline":
+                await interaction.followup.send("Server is offline due to maintenance")
 
 
     @app_commands.command(description="Status checker for the server")
@@ -67,6 +64,16 @@ class ServerGroup(app_commands.Group):
         embed.add_field(name="IP:", value="shieldbois.serveminecraft.net")
 
         await interaction.response.send_message(embed=embed)
+
+
+    @app_commands.command(description="get modpack of the server")
+    async def modpack(self, interaction: discord.Interaction):
+        embed = discord.Embed(title="", description="", color=discord.Color.brand_green())
+        embed.add_field(name="Modpack: ", value="The base mod pack can be downloaded from [Mod pack](https://drive.google.com/file/d/1q_kgWmKOmKaP6QQXv3OPk1Vf5viNu7og/view?usp=drive_link)\
+            \n to update the mod pack, download [update](https://drive.google.com/file/d/1H2I8OAYV1_dbler4g4kb-2j8bEycJEwl/view?usp=drive_link) and copy the files into the mods folder.")
+        
+        await interaction.response.send_message(embed=embed)
+
 
 
 
