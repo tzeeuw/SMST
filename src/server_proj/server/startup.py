@@ -7,7 +7,7 @@ import threading
 import os
 
 
-testing = True
+testing = False
 directory = "C:\\Users\\Thijs\\Minecraft_server\\modded"
 command = "start.bat"
 
@@ -58,6 +58,10 @@ class mc_server():
         while True:
             line = self.proc.stdout.readline().strip()
             print(line)
+
+            if not input_thread.is_alive():
+                input_thread = threading.Thread(target=self.input_thread)
+                input_thread.start()
 
             if "left" in line or "pausing" in line:
                 if int(self.get_player_count()) == 0 and not thread.is_alive():
@@ -170,7 +174,7 @@ else:
             if response=="yes":
 
                 MANUAL_START=False
-                server = mc_server()
+                server = mc_server(directory, command)
                 server.server_start()
 
         else:
@@ -178,5 +182,5 @@ else:
 
             # if pc is manually started to not shutdown or leave the idle loop
             MANUAL_START=True
-            server = mc_server()
+            server = mc_server(directory, command)
             server.idle_loop(t_sec=0)
