@@ -35,16 +35,34 @@ class mc_server():
 
         if MANUAL_START:
             self.idle_loop(t_sec=0)
-        
+
         else:
             self.idle_loop(t_sec=5*60)
 
 
     def input_thread(self):
         user_input = input("")
+
+        if user_input == "restart":
+            self.restart(t=10)
+
         self.proc.stdin.write(f"{user_input}\n")
         return
 
+
+    def restart(self, t):
+
+        self.proc.stdin.write(f"server restarting in {t} seconds")
+
+        time.sleep(t)
+
+        self.proc.stdin.write("stop\n")
+        for line in self.proc.stdout.readlines():
+            print(line.split())
+
+        time.sleep(5)
+
+        self.server_start()
 
 
     def server_loop(self):
