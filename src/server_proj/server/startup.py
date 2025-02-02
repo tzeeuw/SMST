@@ -7,7 +7,7 @@ import threading
 import os
 
 
-testing = False
+testing = True
 directory = "C:\\Users\\Thijs\\Minecraft_server\\modded"
 command = "start.bat"
 
@@ -41,12 +41,21 @@ class mc_server():
 
 
     def input_thread(self):
-        user_input = input("")
+        while True:
+            user_input = input("")
 
-        if user_input == "restart":
-            self.restart(t=10)
+            if user_input == "restart":
+                self.restart(t=10)
 
-        self.proc.stdin.write(f"{user_input}\n")
+            if user_input != "":
+                self.proc.stdin.write(f"{user_input}\n")
+
+                if user_input == "stop":
+                    self.shutdown_server = True
+                    break
+
+            if self.input_kill:
+                break
         return
 
 
@@ -67,6 +76,8 @@ class mc_server():
 
     def server_loop(self):
         thread = threading.Thread(target=self.server_countdown, args=(10*60,))
+
+        self.input_kill = False
         input_thread = threading.Thread(target=self.input_thread)
 
         self.shutdown_server = False
@@ -77,9 +88,6 @@ class mc_server():
             line = self.proc.stdout.readline().strip()
             print(line)
 
-            if not input_thread.is_alive():
-                input_thread = threading.Thread(target=self.input_thread)
-                input_thread.start()
 
             if "left" in line or "pausing" in line:
                 if int(self.get_player_count()) == 0 and not thread.is_alive():
@@ -94,7 +102,8 @@ class mc_server():
 
             if self.shutdown_server:
                 break
-                
+        
+        self.input_kill = True
         self.server_stop()
 
 
@@ -174,9 +183,10 @@ class mc_server():
 #     server.idle_loop(t_sec=30)
 
 if testing:
+    MANUAL_START = True
     server = mc_server(directory, command)
     server.server_start()
-
+    
 else:
     with closing(socket.socket()) as sock:
         sock.settimeout(10)
