@@ -52,7 +52,7 @@ class mc_server():
 
     def restart(self, t):
 
-        self.proc.stdin.write(f"server restarting in {t} seconds")
+        self.proc.stdin.write(f"say server restarting in {t} seconds\n")
 
         time.sleep(t)
 
