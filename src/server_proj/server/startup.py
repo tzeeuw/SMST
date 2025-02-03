@@ -7,7 +7,7 @@ import threading
 import os
 
 
-testing = True
+testing = False
 directory = "C:\\Users\\Thijs\\Minecraft_server\\modded"
 command = "start.bat"
 
@@ -47,7 +47,7 @@ class mc_server():
             if user_input == "restart":
                 self.restart(t=10)
 
-            if user_input != "":
+            elif user_input != "":
                 self.proc.stdin.write(f"{user_input}\n")
 
                 if user_input == "stop":
