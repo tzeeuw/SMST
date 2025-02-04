@@ -50,30 +50,36 @@ class mc_server():
     
 
     def stop(self):
-        """Stops the server and returns the last output of the process
+        """Stops the server and returns the last lines
 
         Returns:
-            str: last output of the process
-        """        
+            str: last lines of the server
+        """      
         self.input("stop")
-        return self.readlines()
+        self.subproc.wait()
+        lines = self.subproc.stdout.readlines()
+        return lines
     
+
     def force_stop(self):
         """Force stops the server
-
-        Raises:
-            NotImplementedError: Not yet implemented
         """        
-        self.input("stop")
-        raise NotImplementedError()
+        self.subproc.terminate()
+        self.subproc.wait()
     
 
-    def restart(self):
+    def restart(self, t=0):
         """Restarts the server
-        """        
+        """
+        time.sleep(t)      
         self.stop()
-        time.sleep(5)
         self.start()
+
+
+    def flush(self):
+        """Flushes the data inside the output to make sure the program is up to date with lines.
+        """        
+        self.subproc.stdout.flush()
 
 
     def input(self, string):
@@ -99,6 +105,6 @@ class mc_server():
 
         Returns:
             str: all lines of the subprocess
-        """        
+        """
         return self.subproc.stdout.readlines()
 
