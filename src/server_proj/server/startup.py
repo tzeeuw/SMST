@@ -5,33 +5,27 @@ import socket
 from contextlib import closing
 import threading
 import os
+from server_proj.server.mc_server import mc_server
 
-
-testing = False
-directory = "C:\\Users\\Thijs\\Minecraft_server\\modded"
+testing = True
+directory = "D:\\Minecraft\\fabric_test"
 command = "start.bat"
 
 
-class mc_server():
+
+
+class mc_handling():
     def __init__(self, directory, command):
         self._server_is_alive = False
-        self.directory = directory
-        self.command = command
+        self.server = mc_server(cmd=command, working_dir=directory)
 
     def server_start(self):
-
-
-        # opens a .bat file from a specified working directory (cwd), links input/output/errors to PIPE to be able to read and write, bufsize=1 will mean that every write ended with a "\n" termination character
-        # will be flushed to the PIPE (thus being excecuted), shell is required to open the process and text=true removes the need of decoding the input and output strings.
-        self.proc = subprocess.Popen(self.command, cwd=self.directory, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, text=True, bufsize=1)
-        self._server_is_alive = True
+        self.server.start()
         self.server_loop()
 
-
     def server_stop(self):
-        self.proc.stdin.write("stop\n")
-        for line in self.proc.stdout.readlines():
-            print(line.split())
+
+        self.server.stop()
 
         if MANUAL_START:
             self.idle_loop(t_sec=0)
@@ -45,10 +39,10 @@ class mc_server():
             user_input = input("")
 
             if user_input == "restart":
-                self.restart(t=10)
+                self.restart()
 
             elif user_input != "":
-                self.proc.stdin.write(f"{user_input}\n")
+                self.server.input(user_input)
 
                 if user_input == "stop":
                     self.shutdown_server = True
@@ -59,19 +53,8 @@ class mc_server():
         return
 
 
-    def restart(self, t):
-
-        self.proc.stdin.write(f"say server restarting in {t} seconds\n")
-
-        time.sleep(t)
-
-        self.proc.stdin.write("stop\n")
-        for line in self.proc.stdout.readlines():
-            print(line.split())
-
-        time.sleep(5)
-
-        self.server_start()
+    def restart(self, t=0):
+        self.server.restart()
 
 
     def server_loop(self):
@@ -85,7 +68,7 @@ class mc_server():
         input_thread.start()
 
         while True:
-            line = self.proc.stdout.readline().strip()
+            line = self.server.readline()
             print(line)
 
 
@@ -118,7 +101,7 @@ class mc_server():
                 return
 
         print("server is stopping")
-        self.proc.stdin.write("say Server is shutting down\n")
+        self.server.input("say Server is shutting down")
         self.shutdown_server = True
 
 
@@ -184,7 +167,7 @@ class mc_server():
 
 if testing:
     MANUAL_START = True
-    server = mc_server(directory, command)
+    server = mc_handling(directory, command)
     server.server_start()
     
 else:
@@ -202,7 +185,7 @@ else:
             if response=="yes":
 
                 MANUAL_START=False
-                server = mc_server(directory, command)
+                server = mc_handling(directory, command)
                 server.server_start()
 
         else:
@@ -210,5 +193,5 @@ else:
 
             # if pc is manually started to not shutdown or leave the idle loop
             MANUAL_START=True
-            server = mc_server(directory, command)
+            server = mc_handling(directory, command)
             server.idle_loop(t_sec=0)
