@@ -1,0 +1,1 @@
+SMST (simple minecraft server tool) is, as the name suggest, a tool to make hosting of minecraft servers on local computers easy and accesible. The only requirement is that a port is forwarded to host the minecraft server on.
