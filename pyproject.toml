@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "server-proj"
+name = "smst"
 version = "0.1.0"
 description = ""
 authors = ["Thijs de Zeeuw <thijs.de.zeeuw8@gmail.com>"]

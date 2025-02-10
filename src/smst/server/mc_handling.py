@@ -6,7 +6,7 @@ import socket
 from contextlib import closing
 import threading
 import os
-from server_proj.server.mc_server import mc_server
+from smst.server.mc_server import mc_server
 
 testing = False
 directory = "C:\\Users\\Thijs\\Minecraft_server\\modded"
