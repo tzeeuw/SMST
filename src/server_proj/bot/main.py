@@ -25,9 +25,10 @@ class ServerGroup(app_commands.Group):
     
     @app_commands.command(description="Starts the server")
     async def start(self, interaction: discord.Interaction):
-        if not 1 < datetime.datetime.now().hour < 10:
-            await interaction.response.defer()
 
+        await interaction.response.defer()
+
+        if not 1 < datetime.datetime.now().hour < 10:
 
             match portcheck.status():
                 case "online":
@@ -54,8 +55,13 @@ class ServerGroup(app_commands.Group):
     async def status(self, interaction: discord.Interaction):
         await interaction.response.defer()
     
-     
-        status = status_dict[portcheck.status()]
+        if not 1 < datetime.datetime.now().hour < 10:
+            status = status_dict[portcheck.status()]
+
+        else:
+            status = status_dict["offline"]
+
+
         embed = discord.Embed(title="", description="", color=status[1])
         embed.add_field(name="Server satus:", value=status[0])
 

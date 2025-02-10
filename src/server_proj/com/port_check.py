@@ -22,7 +22,10 @@ def port_check(_IP=IP, _PORT=PORT):
 def status():
     result = port_check(IP, 25565)
 
-    if result==0:
+    if maintenance:
+        return "offline"
+
+    elif result==0:
         return "online"
 
     elif not maintenance:
@@ -34,8 +37,6 @@ def status():
         else:
             return "sleeping"
         
-    else:
-        return "offline"
 
 
 
