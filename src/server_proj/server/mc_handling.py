@@ -1,13 +1,15 @@
 import time
 import re
+import datetime
+import math
 import socket
 from contextlib import closing
 import threading
 import os
 from server_proj.server.mc_server import mc_server
 
-testing = True
-directory = "D:\\Minecraft\\fabric_test"
+testing = False
+directory = "C:\\Users\\Thijs\\Minecraft_server\\modded"
 command = "start.bat"
 
 
@@ -35,20 +37,21 @@ class mc_handling():
         self.server_loop()
 
 
-    def stop_server(self):
+    def stop_server(self, t_idle=300):
         """Stops the server and puts it into idling mode.
-        """        
+        """
 
-        lines = self.server.stop()
+        self.idling_time = t_idle
+        print("server is stopping")
+        self.shutdown_server = True
+        self.server.input("say Server is shutting down")
+
+        self.server.stop()
+        lines = self.server.readlines()
 
         for line in lines:
             print(line.strip())
 
-        if MANUAL_START:
-            self.idle_loop(t=0)
-
-        else:
-            self.idle_loop(t=300)
 
 
 
@@ -71,13 +74,25 @@ class mc_handling():
                     else:
                         self.restart()
 
-
                 case "stop":
-                    self.shutdown_server = True
-                    self.server.input("say Shutting down the server")
+                    self.MANUAL_STOP = True
+                    self.stop_server(t_idle=1)
+
 
                 case "force stop":
+                    self.MANUAL_STOP = True
                     self.server.force_stop()
+
+
+                case x if x.startswith("overwrite"):
+                    self.overwrite_eepy_time = True
+                    numbers = re.findall(r'\d+', user_input)
+
+                    if numbers:
+                        self.overwrite_delta = int(numbers[0])
+                    
+                    else:
+                        self.overwrite_delta = 30
                     
                 case _:
                     self.server.input(user_input)
@@ -102,6 +117,34 @@ class mc_handling():
                     print(f"Error occurred: {e}")
             
         return
+
+
+    def time_check(self):
+        """Checks and automatically stops the server after a set time. Can be overwritten with the custom overwrite command in which
+        minutes can be added. Usage of overwrite command is "overwrite {n_minutes}"
+        """        
+        self.overwrite_delta=0
+        delta = 0
+        shutdown_said = False
+
+        while not self.kill_time_thread:
+            time.sleep(10)
+
+            # convert overwrite in minutes into hours and minutes
+            if math.floor((delta + 50)/ 60) <= datetime.datetime.now().hour < 10 and datetime.datetime.now().minute >= (delta + 50) % 60 and not shutdown_said:
+                self.server.input("say Server shutting down in 10 minutes. Reason: Eepy time")
+                shutdown_said = True
+
+            if self.overwrite_delta:
+                self.server.input(f"say Server shutdown time overwritten with {self.overwrite_delta} minutes")
+                delta += self.overwrite_delta
+
+                self.overwrite_delta = 0
+                shutdown_said = False
+
+            if math.floor(delta / 60 + 1) <= datetime.datetime.now().hour < 10 and datetime.datetime.now().minute >= (delta) % 60:
+                self.stop_server(t_idle=1)
+                
 
 
     def restart(self, t=0):
@@ -140,28 +183,34 @@ class mc_handling():
                 return
 
         if server:
-            print("server is stopping")
-            self.server.input("say Server is shutting down")
-            self.shutdown_server = True
-
+            self.stop_server(t_idle=300)
+            return
+            
 
         # connect with port that idle loop is listening to and send shutdown message
         if idle:
             with closing(socket.socket()) as sock:
-                sock.connect(("192.168.178.17", 42070))
+                sock.connect(( "yep this was definetely here during time of commit", 42070))
                 sock.send("shutdown".encode())
 
 
-    def server_loop(self):
+
+    def server_loop(self, t=600):
         """Main loop which handles server output and user input. Also automatically shutsdown the server when no players are online.
         """        
-        countdown_thread = threading.Thread(target=self.countdown, kwargs={'server': True, 't': 600})
+        countdown_thread = threading.Thread(target=self.countdown, kwargs={'server': True, 't': t})
+
+        time_thread = threading.Thread(target=self.time_check)
+        self.kill_time_thread = False
+        time_thread.start()
         
         input_thread = threading.Thread(target=self.input_thread)
         self.kill_input_thread = False
         input_thread.start()
 
         self.shutdown_server = False
+
+        self.MANUAL_STOP = False
 
 
         while not self.shutdown_server:
@@ -185,12 +234,15 @@ class mc_handling():
 
                 print("thread broken")
 
-                countdown_thread = threading.Thread(target=self.countdown, kwargs={'server': True, 't': 600})
+                countdown_thread = threading.Thread(target=self.countdown, kwargs={'server': True, 't': t})
 
-        
+        self.kill_time_thread=True
 
-        self.stop_server()
+        if MANUAL_START:
+            self.idle_loop(t=0)
 
+        else:
+            self.idle_loop(t=self.idling_time)
 
 
     def idle_loop(self, t=0):
@@ -208,7 +260,7 @@ class mc_handling():
 
         # listen on socket connected with proxy to see if new connection request is asked and start the server if requested
         with closing(socket.socket()) as sock:
-            sock.bind(("192.168.178.17", 42070))
+            sock.bind(( "yep this was definetely here during time of commit", 42070))
 
             while True:
                 sock.listen()
@@ -216,10 +268,16 @@ class mc_handling():
                 (proxy_socket, proxy_address) = sock.accept()
                 message = proxy_socket.recv(1024).decode()
 
+
+                self.kill_input_thread = True
+
+                if testing or self.MANUAL_STOP:
+                    exit()
+
                 if message=="start server":
                     if not MANUAL_START:
                         if thread.is_alive():
-                            self.kill_thread=True
+                            self.kill_countdown_thread=True
                             thread.join()
                     break                           #break so that server is not started from within while True loop
 
@@ -242,7 +300,12 @@ class mc_handling():
         self.server.input("list")
         line = self.server.readline()
         print(line)
-        player_count = line[line.index("of a max")-2] # very rudementairy should change it to be more rigorous
+        try:
+            player_count = line[line.index("of a max")-2] # very rudementairy should change it to be more rigorous
+        
+        except:
+            player_count = 0
+            print("Could not find amount of players due to index out of range error")
 
         return int(player_count)
 
@@ -280,4 +343,4 @@ else:
             # if pc is manually started to not shutdown or leave the idle loop
             MANUAL_START=True
             server = mc_handling(directory, command)
-            server.idle_loop(t_sec=0)
+            server.idle_loop(t=0)

@@ -57,9 +57,7 @@ class mc_server():
         """      
         self.input("stop")
         self.subproc.wait()
-        lines = self.subproc.stdout.readlines()
-        return lines
-    
+
 
     def force_stop(self):
         """Force stops the server
