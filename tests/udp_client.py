@@ -7,7 +7,7 @@ UDP_PORT = 42070
 sock = socket.socket()
 
 sock.connect((UDP_IP, UDP_PORT))
-sock.send("faggot".encode())
+sock.send("hey".encode())
 
 data = sock.recv(1024).decode()
 
