@@ -2,11 +2,15 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import datetime
+import json
 
-import server_proj.com.port_check as portcheck
+import smst.com.port_check as portcheck
 
+with open('properties.json', 'r') as file:
+    properties = json.load(file)
 
-GUILD_ID = [discord.Object(id= 'Totally did not commit sensitive information here :)'), discord.Object(id= 'Here too maybe perhaps :*)')]
+GUILD_ID = [discord.Object(id=guild_id) for guild_id in properties["guild_ids"]]
+TOKEN=properties["bot_token"]
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -109,5 +113,5 @@ async def on_ready():
             print(f"Error syncing commands; {e}")
 
 
-TOKEN= 'Totally did not commit sensitive information here :)'
+
 test_client.run(TOKEN)

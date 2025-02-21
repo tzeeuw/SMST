@@ -3,6 +3,12 @@ from PySide6 import QtWidgets, QtGui
 from PySide6.QtCore import *
 import sys
 import threading
+import json
+
+
+with open('properties.json', 'r') as file:
+    properties = json.load(file)
+
 
 
 class mcgui(QtWidgets.QMainWindow):
@@ -11,8 +17,8 @@ class mcgui(QtWidgets.QMainWindow):
         window_center = QtGui.QGuiApplication.primaryScreen().size().toTuple()
 
         #TODO: make command and directory not required for handler
-        directory = "D:\\Minecraft\\fabric_test"
-        command = "start.bat"
+        directory = properties["cwd"]
+        command = properties["cmd"]
         self.server = handler(directory=directory, command=command)
 
 

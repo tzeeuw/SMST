@@ -8,10 +8,17 @@ import threading
 import os
 from smst.server.mc_server import mc_server
 import collections
+import json
 
+with open('properties.json', 'r') as file:
+    properties = json.load(file)
+
+IP = properties["local_server_ip"]
+PORT = properties["com_port"]
+BOT_IP = properties["local_bot_ip"]
 testing = False
-directory = "C:\\Users\\Thijs\\Minecraft_server\\modded"
-command = "start.bat"
+directory = properties["cwd"]
+command = properties["cmd"]
 
 
 
@@ -192,7 +199,7 @@ class mc_handling():
         # connect with port that idle loop is listening to and send shutdown message
         if idle:
             with closing(socket.socket()) as sock:
-                sock.connect(( "yep this was definetely here during time of commit", 42070))
+                sock.connect((IP, PORT))
                 sock.send("shutdown".encode())
 
 
@@ -276,7 +283,7 @@ class mc_handling():
 
         # listen on socket connected with proxy to see if new connection request is asked and start the server if requested
         with closing(socket.socket()) as sock:
-            sock.bind(( "yep this was definetely here during time of commit", 42070))
+            sock.bind((IP, PORT))
 
             while True:
                 sock.listen()
@@ -337,7 +344,7 @@ if __name__ == "__main__":
     else:
         with closing(socket.socket()) as sock:
             sock.settimeout(10)
-            result = sock.connect_ex((( "and this one too", 42070)))
+            result = sock.connect_ex(((BOT_IP, PORT)))
 
             if result==0:
                 sock.send("wake up?".encode())

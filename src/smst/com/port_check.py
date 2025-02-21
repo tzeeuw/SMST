@@ -1,12 +1,16 @@
 import socket
 from contextlib import closing
-from server_proj.com.wol import wake_server
+from smst.com.wol import wake_server
 import threading
+import json
+
+with open('properties.json', 'r') as file:
+    properties = json.load(file)
 
 
-
-IP =  "yep this was definetely here during time of commit"
-PORT = 42070
+IP = properties["local_server_ip"]
+BOT_IP = properties["local_bot_ip"]
+PORT = properties["com_port"]
 
 maintenance = False
 
@@ -102,7 +106,7 @@ def start_thread(prot=None):
         wake_server()
 
         with closing(socket.socket()) as sock:
-            sock.bind(( "and this one too", PORT))
+            sock.bind((BOT_IP, PORT))
 
             sock.listen()
             

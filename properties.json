@@ -1,0 +1,10 @@
+{
+    "bot_token":  "Totally did not commit sensitive information here :)",
+    "local_bot_ip":  "and this one too",
+    "local_server_ip":  "yep this was definetely here during time of commit",
+    "com_port": 42070,
+    "guild_ids": [ "Totally did not commit sensitive information here :)",  "Here too maybe perhaps  :*)"],
+    "cmd": "start.bat",
+    "cwd": "D:\\Minecraft\\fabric_test"
+
+}
