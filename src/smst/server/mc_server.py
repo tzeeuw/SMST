@@ -46,6 +46,8 @@ class mc_server():
         if working_dir != None:
             self.cwd = working_dir
 
+
+        # TODO: implement check if self.subproc already exists    
         self.__create_subproc(cmd=self.cmd, working_dir=self.cwd)
     
 

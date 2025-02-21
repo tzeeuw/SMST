@@ -6,9 +6,11 @@ authors = ["Thijs de Zeeuw <thijs.de.zeeuw8@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.14"
 pyshark = "^0.6"
 discord = "^2.3.2"
+pyside6 = "^6.8.2.1"
+screeninfo = "^0.8.1"
 
 [tool.poetry.scripts]
 

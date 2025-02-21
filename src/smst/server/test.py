@@ -18,11 +18,12 @@
 
 import subprocess
 
-cmd = ['python', 'proc.py']
-working_dir = 'src\\server_proj\\server'
+string = "balasdfa" + "\n"
+max_lines = 256
+lines = [""]*256
+lines[0] = string
 
-subproc = subprocess.Popen(cmd, cwd=working_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, text=True, bufsize=1)
+lines[3] = "awdfasdf" + "\n"
 
-while True:
-    line = subproc.stdout.readline()
-    print(line)
+print("".join(lines))
+

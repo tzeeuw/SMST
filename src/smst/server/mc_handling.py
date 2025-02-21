@@ -7,6 +7,7 @@ from contextlib import closing
 import threading
 import os
 from smst.server.mc_server import mc_server
+import collections
 
 testing = False
 directory = "C:\\Users\\Thijs\\Minecraft_server\\modded"
@@ -14,7 +15,7 @@ command = "start.bat"
 
 
 
-
+#TODO: remodel entire class as it is too user input dependent
 class mc_handling():
     """Handles the minecraft server using the mc_server class to interact with the server
     """    
@@ -34,7 +35,8 @@ class mc_handling():
         """Starts the server.
         """        
         self.server.start()
-        self.server_loop()
+        self.server_thread = threading.Thread(target=self.server_loop)
+        self.server_thread.start()
 
 
     def stop_server(self, t_idle=300):
@@ -212,13 +214,20 @@ class mc_handling():
 
         self.MANUAL_STOP = False
 
+        max_lines = 256
+
+        self.lines = collections.deque([""]*max_lines)
+
 
         while not self.shutdown_server:
             
             line = self.server.readline()
+           
 
             if line:
                 print(line)
+                self.lines.append(line)
+                self.lines.popleft()
 
             # see if players left and there are still players online
             if "left" in line or "pausing" in line:
@@ -237,6 +246,11 @@ class mc_handling():
                 countdown_thread = threading.Thread(target=self.countdown, kwargs={'server': True, 't': t})
 
         self.kill_time_thread=True
+        self.kill_input_thread = True
+
+        # bit of a cheesy and bad fix should fix this fix?
+        if self.idling_time == -1:
+            return
 
         if MANUAL_START:
             self.idle_loop(t=0)
@@ -257,6 +271,8 @@ class mc_handling():
             thread = threading.Thread(target=self.countdown, kwargs={'idle': True, 't': t})
             thread.start()
 
+        elif t == -1:
+            return
 
         # listen on socket connected with proxy to see if new connection request is asked and start the server if requested
         with closing(socket.socket()) as sock:
@@ -268,8 +284,7 @@ class mc_handling():
                 (proxy_socket, proxy_address) = sock.accept()
                 message = proxy_socket.recv(1024).decode()
 
-
-                self.kill_input_thread = True
+                
 
                 if testing or self.MANUAL_STOP:
                     exit()
@@ -311,36 +326,36 @@ class mc_handling():
 
 
 
+if __name__ == "__main__":
+    if testing:
+        MANUAL_START = False
+        server = mc_handling(directory, command)
+        server.start_server()
 
-if testing:
-    MANUAL_START = False
-    server = mc_handling(directory, command)
-    server.start_server()
 
 
+    else:
+        with closing(socket.socket()) as sock:
+            sock.settimeout(10)
+            result = sock.connect_ex((( "and this one too", 42070)))
 
-else:
-    with closing(socket.socket()) as sock:
-        sock.settimeout(10)
-        result = sock.connect_ex((( "and this one too", 42070)))
+            if result==0:
+                sock.send("wake up?".encode())
 
-        if result==0:
-            sock.send("wake up?".encode())
+                response = sock.recv(1024).decode()
 
-            response = sock.recv(1024).decode()
+                print(response)
 
-            print(response)
+                if response=="yes":
 
-            if response=="yes":
+                    MANUAL_START=False
+                    server = mc_handling(directory, command)
+                    server.start_server()
 
-                MANUAL_START=False
+            else:
+                print("Not starting server, but idling")
+
+                # if pc is manually started to not shutdown or leave the idle loop
+                MANUAL_START=True
                 server = mc_handling(directory, command)
-                server.start_server()
-
-        else:
-            print("Not starting server, but idling")
-
-            # if pc is manually started to not shutdown or leave the idle loop
-            MANUAL_START=True
-            server = mc_handling(directory, command)
-            server.idle_loop(t=0)
+                server.idle_loop(t=0)
