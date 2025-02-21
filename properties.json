@@ -1,10 +1,10 @@
 {
-    "bot_token":  "Totally did not commit sensitive information here :)",
-    "local_bot_ip":  "and this one too",
-    "local_server_ip":  "yep this was definetely here during time of commit",
-    "com_port": 42070,
-    "guild_ids": [ "Totally did not commit sensitive information here :)",  "Here too maybe perhaps  :*)"],
-    "cmd": "start.bat",
-    "cwd": "D:\\Minecraft\\fabric_test"
+    "bot_token": "input_bot_token_here",
+    "local_bot_ip": "input_local_bot_ip_here",
+    "local_server_ip": "input_local_server_ip_here",
+    "com_port": "communication_port",
+    "guild_ids": ["input_guild_ids_here", "seperated_with_,"],
+    "cmd": "input_command_here",
+    "cwd": "input_directory_here"
 
 }
