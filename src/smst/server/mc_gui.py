@@ -1,4 +1,4 @@
-from smst.server.mc_handling import mc_handling as handler
+from smst.server.base_server import base_server
 from PySide6 import QtWidgets, QtGui
 from PySide6.QtCore import *
 import sys
@@ -19,7 +19,7 @@ class mcgui(QtWidgets.QMainWindow):
         #TODO: make command and directory not required for handler
         directory = properties["cwd"]
         command = properties["cmd"]
-        self.server = handler(directory=directory, command=command)
+        self.server = base_server(cmd=command, cwd=directory)
 
 
 
@@ -46,7 +46,8 @@ class mcgui(QtWidgets.QMainWindow):
 
         self.input_box = QtWidgets.QLineEdit()
         self.input_box.installEventFilter(self)
-        
+
+
     def eventFilter(self, obj, event):
         if event.type() == QEvent.KeyPress and obj is self.input_box:
             if event.key() == Qt.Key_Return and self.input_box.hasFocus():
@@ -115,7 +116,7 @@ class mcgui(QtWidgets.QMainWindow):
     def stop_server(self):
         self.stop_button.setEnabled(False)
         self.start_button.setEnabled(True)
-        self.server.stop_server(t_idle=-1)
+        self.server.stop_server()
 
     
 

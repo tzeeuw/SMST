@@ -1,3 +1,8 @@
 import random
 
-print(random.random())
+def foo():
+    while True:
+        bar()
+
+def bar():
+    

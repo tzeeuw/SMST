@@ -67,7 +67,7 @@ class mc_server():
         self.subproc.terminate()
         self.subproc.wait()
     
-
+    #TODO: fix command as it does not work
     def restart(self, t=0):
         """Restarts the server
         """
@@ -99,6 +99,13 @@ class mc_server():
         """        
         return self.subproc.stdout.readline().strip()
 
+    def raw_readline(self):
+        """Reads a single line but keeps it with termination characters.
+
+        Returns:
+            str: Single line of outpot from the subprocess
+        """        
+        return self.subproc.stdout.readline()
 
     def readlines(self):
         """Reads all lines starting from the call of this method to the end of the subprocess.

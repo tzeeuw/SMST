@@ -1,7 +1,7 @@
 import time
 import sys
 
-while True:
+for i in range(5):
     time.sleep(1)
-    print("test")
-    # sys.stdout.flush()
+    print("")
+    #sys.stdout.flush()

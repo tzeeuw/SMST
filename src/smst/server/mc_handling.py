@@ -37,6 +37,9 @@ class mc_handling():
         self._server_is_alive = False
         self.server = mc_server(cmd=command, working_dir=directory)
 
+        max_lines = 256
+        self.lines = collections.deque([""]*max_lines)
+
 
     def start_server(self):
         """Starts the server.
@@ -221,9 +224,9 @@ class mc_handling():
 
         self.MANUAL_STOP = False
 
-        max_lines = 256
+        
 
-        self.lines = collections.deque([""]*max_lines)
+        
 
 
         while not self.shutdown_server:
