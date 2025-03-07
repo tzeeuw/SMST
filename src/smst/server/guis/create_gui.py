@@ -51,7 +51,6 @@ class create_window(QtWidgets.QWidget):
         self.eula_check.checkStateChanged.connect(lambda: self.ok_button.setEnabled((self.ok_button.isEnabled() + 1) % 2))
 
 
-
         self.eula_text = QtWidgets.QLabel()
         self.eula_text.setText('I accept the <a href="https://aka.ms/MinecraftEULA">Minecraft EULA</a>')
         self.eula_text.setOpenExternalLinks(True)

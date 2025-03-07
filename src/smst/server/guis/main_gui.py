@@ -29,6 +29,7 @@ class mcgui(QtWidgets.QMainWindow):
         self.init_layout()
         self.init_widgets()
         self.init_menubar()
+        self.init_sidebar()
         self.add_layout()
         
 
@@ -60,12 +61,29 @@ class mcgui(QtWidgets.QMainWindow):
     
 
 
+    def init_sidebar(self):
+        self.toolbar = QtWidgets.QToolBar()
+        self.toolbar.setMinimumWidth(100)
+        self.toolbar.setIconSize(QSize(50, 50))
+
+        self.create_action = QtGui.QAction(QtGui.QIcon("create.png"), "Test")
+        self.create_action.triggered.connect(self.create_server)
+
+        self.toolbar.setMovable(False)
+
+
+        self.toolbar.addAction(self.create_action)
+
+        self.addToolBar(Qt.LeftToolBarArea, self.toolbar)
+
+
 
     def init_menubar(self):
         self.menu_bar = QtWidgets.QMenuBar()
         self.menu = QtWidgets.QMenu("server")
         
         self.menu.addAction("create server", self.create_server)
+
 
         self.menu_bar.addMenu(self.menu)
         self.setMenuBar(self.menu_bar)
@@ -82,12 +100,15 @@ class mcgui(QtWidgets.QMainWindow):
         self.vbox_text = QtWidgets.QVBoxLayout()
         self.hbox_central.addLayout(self.vbox_text)
 
+        
+
     def add_layout(self):
         self.hbox_buttons.addWidget(self.start_button)
         self.hbox_buttons.addWidget(self.stop_button)
 
         self.vbox_text.addWidget(self.terminal_text)
         self.vbox_text.addWidget(self.input_box)
+
 
 
     #TODO: fix jumping of scrollbar
