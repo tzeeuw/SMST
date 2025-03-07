@@ -1,8 +1,8 @@
-import random
+import json
 
-def foo():
-    while True:
-        bar()
 
-def bar():
-    
+version_list = json.load(open("versions.json", 'r'))
+
+installation_versions = version_list.keys()
+
+print(version_list.keys())

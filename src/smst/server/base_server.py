@@ -9,7 +9,7 @@ class base_server():
         self.cwd = cwd
         self.server = mc_server(self.cmd, self.cwd)
         max_lines = 256
-        self.lines = collections.deque(max_lines*[""])
+        self.lines = collections.deque(maxlen=max_lines)
 
 
     def start_server(self):
@@ -27,7 +27,6 @@ class base_server():
 
     def add_lines(self):
         for line in iter(self.server.raw_readline, ''):
-            self.lines.popleft()
             self.lines.append(line.strip())
             print(line.strip())
 

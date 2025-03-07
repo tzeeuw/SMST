@@ -2,7 +2,7 @@ from smst.server.base_server import base_server
 from PySide6 import QtWidgets, QtGui
 from PySide6.QtCore import *
 import sys
-import threading
+from smst.server.guis import create_gui
 import json
 
 
@@ -10,7 +10,7 @@ with open('properties.json', 'r') as file:
     properties = json.load(file)
 
 
-
+#TODO: possbile split ui setup and inner workings into two classes and call the ui with self.ui.setupUI(self)?
 class mcgui(QtWidgets.QMainWindow):
     def __init__(self, size=(1600, 900)):
         super().__init__()
@@ -44,6 +44,7 @@ class mcgui(QtWidgets.QMainWindow):
         self.terminal_text.setText("Test")
         self.terminal_text.setReadOnly(True)
 
+
         self.input_box = QtWidgets.QLineEdit()
         self.input_box.installEventFilter(self)
 
@@ -62,8 +63,10 @@ class mcgui(QtWidgets.QMainWindow):
 
     def init_menubar(self):
         self.menu_bar = QtWidgets.QMenuBar()
-        self.menu = QtWidgets.QMenu("test")
+        self.menu = QtWidgets.QMenu("server")
         
+        self.menu.addAction("create server", self.create_server)
+
         self.menu_bar.addMenu(self.menu)
         self.setMenuBar(self.menu_bar)
 
@@ -91,20 +94,24 @@ class mcgui(QtWidgets.QMainWindow):
     def update_text(self):
 
         prev_value = self.terminal_text.verticalScrollBar().value()
+        at_bottom = prev_value > self.terminal_text.verticalScrollBar().maximum() - 4
 
         lines = "\n".join(self.server.lines)
         self.terminal_text.setText(lines)
 
         self.terminal_text.ensureCursorVisible()
-        self.terminal_text.verticalScrollBar().setSliderPosition(prev_value)
 
+        if at_bottom:
+            self.terminal_text.verticalScrollBar().setSliderPosition(self.terminal_text.verticalScrollBar().maximum())
 
+        else:
+            self.terminal_text.verticalScrollBar().setSliderPosition(prev_value)
 
 
     def start_server(self):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_text)
-        self.timer.start(10)
+        self.timer.start(100)
 
 
         self.start_button.setEnabled(False)
@@ -119,6 +126,10 @@ class mcgui(QtWidgets.QMainWindow):
         self.server.stop_server()
 
     
+    def create_server(self):
+        self.dialog_window = create_gui.create_window()
+        self.dialog_window.show()
+
 
 
 
@@ -132,5 +143,3 @@ if __name__ == "__main__":
 
     window.show()
     sys.exit(app.exec())
-
-
