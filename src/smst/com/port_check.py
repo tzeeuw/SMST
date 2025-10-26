@@ -10,7 +10,7 @@ with open('properties.json', 'r') as file:
 
 IP = properties["local_server_ip"]
 BOT_IP = properties["local_bot_ip"]
-PORT = properties["com_port"]
+PORT = int(properties["com_port"])
 
 maintenance = False
 

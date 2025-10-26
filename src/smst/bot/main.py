@@ -80,13 +80,13 @@ class ServerGroup(app_commands.Group):
         await interaction.response.send_message(embed=embed)
 
 
-    @app_commands.command(description="get modpack of the server")
-    async def modpack(self, interaction: discord.Interaction):
-        embed = discord.Embed(title="", description="", color=discord.Color.brand_green())
-        embed.add_field(name="Modpack: ", value="The base mod pack can be downloaded from [Mod pack](https://drive.google.com/file/d/1q_kgWmKOmKaP6QQXv3OPk1Vf5viNu7og/view?usp=drive_link)\
-            \n to update the mod pack, download the [update](https://drive.google.com/drive/folders/1pJIBi3O2G3sV5msqE8XP7Gr5io7lEAoZ?usp=drive_link) and copy the files into the mods folder.")
+    # @app_commands.command(description="get modpack of the server")
+    # async def modpack(self, interaction: discord.Interaction):
+    #     embed = discord.Embed(title="", description="", color=discord.Color.brand_green())
+    #     embed.add_field(name="Modpack: ", value="The base mod pack can be downloaded from [Mod pack](https://drive.google.com/file/d/1q_kgWmKOmKaP6QQXv3OPk1Vf5viNu7og/view?usp=drive_link)\
+    #         \n to update the mod pack, download the [update](https://drive.google.com/drive/folders/1pJIBi3O2G3sV5msqE8XP7Gr5io7lEAoZ?usp=drive_link) and copy the files into the mods folder.")
         
-        await interaction.response.send_message(embed=embed)
+    #     await interaction.response.send_message(embed=embed)
 
 
 
