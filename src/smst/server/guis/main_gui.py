@@ -2,9 +2,9 @@ from smst.server.base_server import base_server
 from PySide6 import QtWidgets, QtGui
 from PySide6.QtCore import *
 import sys
+import os
 from smst.server.guis import create_gui
 import json
-
 
 with open('properties.json', 'r') as file:
     properties = json.load(file)
@@ -14,6 +14,8 @@ with open('properties.json', 'r') as file:
 class mcgui(QtWidgets.QMainWindow):
     def __init__(self, size=(1600, 900)):
         super().__init__()
+
+        # always load window in the middle of the primary screen
         window_center = QtGui.QGuiApplication.primaryScreen().size().toTuple()
 
         #TODO: make command and directory not required for handler
@@ -21,8 +23,8 @@ class mcgui(QtWidgets.QMainWindow):
         command = properties["cmd"]
         self.server = base_server(cmd=command, cwd=directory)
 
-
-
+        # get all current installed servers
+        self.installed_servers = self.get_servers()
 
         #self.setGeometry(QRect(QPoint(780, 470), QSize(*size)))
         self.setGeometry(QRect(QPoint((window_center[0]-size[0])/2, (window_center[1]-size[1])/2), QSize(*size)))
@@ -48,9 +50,15 @@ class mcgui(QtWidgets.QMainWindow):
 
         self.input_box = QtWidgets.QLineEdit()
         self.input_box.installEventFilter(self)
+        
 
+        self.server_select = QtWidgets.QComboBox()
+        self.server_select.setPlaceholderText("--select server--")
+        self.server_select.addItems(self.get_servers())
 
     def eventFilter(self, obj, event):
+
+        # register if command is entered in the command bar
         if event.type() == QEvent.KeyPress and obj is self.input_box:
             if event.key() == Qt.Key_Return and self.input_box.hasFocus():
                 self.server.input_handling(self.input_box.text())
@@ -66,7 +74,7 @@ class mcgui(QtWidgets.QMainWindow):
         self.toolbar.setMinimumWidth(100)
         self.toolbar.setIconSize(QSize(50, 50))
 
-        self.create_action = QtGui.QAction(QtGui.QIcon("create.png"), "Test")
+        self.create_action = QtGui.QAction(QtGui.QIcon("create2.png"), "Test")
         self.create_action.triggered.connect(self.create_server)
 
         self.toolbar.setMovable(False)
@@ -94,8 +102,13 @@ class mcgui(QtWidgets.QMainWindow):
 
         self.hbox_central = QtWidgets.QHBoxLayout(self.central_widget)
 
+
+        self.vbox_options = QtWidgets.QVBoxLayout()
+        self.hbox_central.addLayout(self.vbox_options)
+
         self.hbox_buttons = QtWidgets.QHBoxLayout()
-        self.hbox_central.addLayout(self.hbox_buttons)
+        self.vbox_options.addLayout(self.hbox_buttons)
+        
 
         self.vbox_text = QtWidgets.QVBoxLayout()
         self.hbox_central.addLayout(self.vbox_text)
@@ -105,6 +118,8 @@ class mcgui(QtWidgets.QMainWindow):
     def add_layout(self):
         self.hbox_buttons.addWidget(self.start_button)
         self.hbox_buttons.addWidget(self.stop_button)
+
+        self.vbox_options.addWidget(self.server_select)
 
         self.vbox_text.addWidget(self.terminal_text)
         self.vbox_text.addWidget(self.input_box)
@@ -128,6 +143,12 @@ class mcgui(QtWidgets.QMainWindow):
         else:
             self.terminal_text.verticalScrollBar().setSliderPosition(prev_value)
 
+    def get_servers(self):
+        save_folder = properties["install_folder"]
+        servers = [folder for folder in sorted(os.listdir(save_folder)) if os.path.isdir(save_folder+'\\' + folder)]
+        return servers
+
+
 
     def start_server(self):
         self.timer = QTimer()
@@ -149,7 +170,12 @@ class mcgui(QtWidgets.QMainWindow):
     
     def create_server(self):
         self.dialog_window = create_gui.create_window()
+        self.dialog_window.close_signal.connect(self.on_create_close)
         self.dialog_window.show()
+
+    def on_create_close(self, server_jar):
+        print(server_jar)
+        self.server = base_server(cmd=server_jar[1], cwd=server_jar[0])
 
 
 

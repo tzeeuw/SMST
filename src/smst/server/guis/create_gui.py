@@ -1,8 +1,11 @@
 from PySide6 import QtWidgets
+from PySide6.QtCore import Signal
 import os
 import json
 import requests
-
+import subprocess
+import fileinput
+import sys
 
 
 
@@ -10,6 +13,10 @@ import requests
 
 #TODO: fix this mess of a code
 class create_window(QtWidgets.QWidget):
+
+    close_signal = Signal(tuple)
+
+
     def __init__(self):
         super().__init__()
 
@@ -78,7 +85,6 @@ class create_window(QtWidgets.QWidget):
 
     def get_file_name(self):
         self.folder = QtWidgets.QFileDialog.getExistingDirectory(self, "Choose folder")
-        print(self.folder)
 
 
     def download(self):
@@ -107,9 +113,16 @@ class create_window(QtWidgets.QWidget):
                     response = requests.get(url, params=query_params)
                     print(response.ok)
 
+                    file_name = f"server_{installation}_{version}.jar"
+
                     if response.ok:
-                        with open(f"{install_path}/server_{installation}_{version}.jar", mode="wb") as file:
+                        with open(f"{install_path}/{file_name}", mode="wb") as file:
                             file.write(response.content)
+
+
+                    self.init_jar(installation=installation, file=file_name, cwd=install_path, eula=True)
+
+
                 else:
                     print("no folder selected or something")
 
@@ -118,6 +131,33 @@ class create_window(QtWidgets.QWidget):
 
         else:
             print("not allowed installation or something idk")
+
+
+
+    # prop only for vanilla servers
+    def init_jar(self, installation, file, cwd, eula=False):
+
+        if not eula:
+            print("eula not accepted")
+            return
+        
+
+        cmd = f"java -jar {file}"
+        # use subprocess.DEVNULL to avoid output
+        proc = subprocess.run(cmd, cwd=cwd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+        print("jar executed")
+
+
+        # Not sure if I like this method of replacing the EULA line
+        for line in fileinput.input(f"{cwd}/eula.txt", inplace=1):
+            if "eula=false" in line:
+                line = "eula=TRUE"
+
+            sys.stdout.write(line)
+        
+        self.server_jar = (cwd, file)
+
 
 
     def get_url(self, installer, version):
@@ -137,3 +177,10 @@ class create_window(QtWidgets.QWidget):
 
         return False
     
+    
+
+    def closeEvent(self, event):
+        
+        self.close_signal.emit(self.server_jar)
+
+        event.accept()
