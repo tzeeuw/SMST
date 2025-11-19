@@ -8,7 +8,6 @@ import smst.com.port_check as portcheck
 
 with open('properties.json', 'r') as file:
     properties = json.load(file)
-
 GUILD_ID = [discord.Object(id=guild_id) for guild_id in properties["guild_ids"]]
 TOKEN=properties["bot_token"]
 intents = discord.Intents.default()
@@ -74,8 +73,12 @@ class ServerGroup(app_commands.Group):
 
     @app_commands.command(description="retrieves the server IP")
     async def ip(self, interaction: discord.Interaction):
-        embed = discord.Embed(title="", description="", color=discord.Color.blurple())
-        embed.add_field(name="IP:", value="shieldbois.serveminecraft.net")
+        if properties["guild_ids"][f"{interaction.guild.id}"] == "nikhef":
+            embed = discord.Embed(title="", description="", color=discord.Color.blurple())
+            embed.add_field(name="IP:", value="darkmatteriscoolest.serveminecraft.net")
+        else:
+            embed = discord.Embed(title="", description="", color=discord.Color.blurple())
+            embed.add_field(name="IP:", value="je joden vader")
 
         await interaction.response.send_message(embed=embed)
 
