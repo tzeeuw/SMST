@@ -31,6 +31,31 @@ class ServerGroup(app_commands.Group):
 
         await interaction.response.defer()
 
+        if properties["guild_ids"][f"{interaction.guild.id}"] != "nikhef":
+            if not 1 < datetime.datetime.now().hour < 10:
+
+                match portcheck.status():
+                    case "online":
+                        await interaction.followup.send("Server is already online")
+
+                    case "idling":
+                        await interaction.followup.send("Server is starting")
+                        portcheck.start(prot="idling")
+
+                    case "sleeping":
+                        await interaction.followup.send("Server is waking up and starting.")
+
+                        portcheck.start(prot="sleeping")
+
+
+                    case "offline":
+                        await interaction.followup.send("Server is offline due to maintenance")
+
+            else:
+                await interaction.followup.send("Ga eens slapen joh")
+        else:
+            await interaction.followup.send("Undergoing some surgery, will be back soon.")
+
         if not 1 < datetime.datetime.now().hour < 10:
 
             match portcheck.status():
@@ -64,9 +89,12 @@ class ServerGroup(app_commands.Group):
         else:
             status = status_dict["offline"]
 
-
-        embed = discord.Embed(title="", description="", color=status[1])
-        embed.add_field(name="Server satus:", value=status[0])
+        if properties["guild_ids"][f"{interaction.guild.id}"] != "nikhef":
+            embed = discord.Embed(title="", description="", color=status[1])
+            embed.add_field(name="Server satus:", value=status[0])
+        else:
+            embed = discord.Embed(title="", description="", color=discord.Color.red())
+            embed.add_field(name="Server satus:", value="Current undergoing some surgery")
 
         await interaction.followup.send(embed=embed)
 
@@ -75,7 +103,7 @@ class ServerGroup(app_commands.Group):
     async def ip(self, interaction: discord.Interaction):
         if properties["guild_ids"][f"{interaction.guild.id}"] == "nikhef":
             embed = discord.Embed(title="", description="", color=discord.Color.blurple())
-            embed.add_field(name="IP:", value="darkmatteriscoolest.serveminecraft.net")
+            embed.add_field(name="IP:", value="Undergoing some surgery will be back someday")
         else:
             embed = discord.Embed(title="", description="", color=discord.Color.blurple())
             embed.add_field(name="IP:", value="je joden vader")
