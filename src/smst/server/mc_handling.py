@@ -16,9 +16,10 @@ with open('properties.json', 'r') as file:
 IP = properties["local_server_ip"]
 PORT = properties["com_port"]
 BOT_IP = properties["local_bot_ip"]
-testing = False
+testing = True
 directory = properties["cwd"]
 command = properties["cmd"]
+TOKEN = properties["token"]
 
 
 
@@ -129,6 +130,80 @@ class mc_handling():
                     print(f"Error occurred: {e}")
             
         return
+    
+
+    def remote_socket(self, conn: socket.socket):
+
+        # use token verification because it is cool
+        conn.sendall(b"Token: ")
+        recv_token = conn.recv(1024).decode().strip()
+
+        if recv_token != TOKEN:
+            conn.sendall(b"Auth failed\n")
+            conn.close()
+            return
+        
+        conn.sendall(b"your*, help for all commands.\n")
+
+        # so that lines are also parsed to the connected shell
+        self.shell_connect = True
+        self.conn = conn
+
+        try:
+            while True:
+                conn.sendall(b"> ")
+                line = conn.recv(1024)
+
+                # test if the line is not empty
+                if not line:
+                    continue
+
+                # get the command
+                command = line.decode().strip().lower()
+
+
+                match command:
+                    case "exit":
+                        conn.sendall(b"Nah fuck you\n")
+                        break
+
+                    # sends the history of lines from the terminal
+                    case x if x.startswith("history"):
+                        nlines = int(re.findall(r'\d+', command)[0])
+
+                        if nlines and nlines < 256:
+                            # maybe could be cleaner idk
+                            for line in list(self.lines)[-nlines:]:
+                                conn.sendall(f"{line}\n".encode())
+
+                        elif nlines and nlines >= 256:
+                            conn.sendall(f"{nlines} is greater than buffer, showing 256 lines.\n".encode())
+                            for line in self.lines:
+                                conn.sendall(f"{line}\n".encode())
+                        
+                        else:
+                            conn.sendall(f"No history lenght is given, showing last 10 lines.\n".encode())
+                        
+                    case _:
+                        self.input_handling(command)
+                        
+
+        # close the connection when python script is closed on other end
+        finally:
+            conn.close()
+            self.shell_connect = False
+
+    def remote_input(self):
+        
+        # this creates a socket once and continiously reaccepts connections to this socket and creates a new thread when a new connection is made
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind((IP, PORT-1))
+        s.listen(5)
+        print(f"listening on {IP}:{PORT-1}")
+        while not self.kill_remote_input_thread:
+            conn, _ = s.accept()
+            threading.Thread(target=self.remote_socket, kwargs={'conn': conn}, daemon=True).start()
 
 
     def time_check(self):
@@ -220,17 +295,18 @@ class mc_handling():
         self.kill_input_thread = False
         input_thread.start()
 
+        # used to send output back to the ssh shell
+        self.shell_connect = False
+        remote_input = threading.Thread(target=self.remote_input)
+        self.kill_remote_input_thread = False
+        remote_input.start()
+
         self.shutdown_server = False
 
         self.MANUAL_STOP = False
-
         
-
-        
-
 
         while not self.shutdown_server:
-            
             line = self.server.readline()
            
 
@@ -238,6 +314,12 @@ class mc_handling():
                 print(line)
                 self.lines.append(line)
                 self.lines.popleft()
+
+                # also send to shell if it is connected
+                if self.shell_connect:
+                    self.conn.sendall(f"{line}\n".encode())
+                    self.conn.sendall(b"> ")
+
 
             # see if players left and there are still players online
             if "left" in line or "pausing" in line:
