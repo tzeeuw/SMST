@@ -8,7 +8,6 @@ import smst.com.port_check as portcheck
 
 with open('properties.json', 'r') as file:
     properties = json.load(file)
-
 GUILD_ID = [discord.Object(id=guild_id) for guild_id in properties["guild_ids"]]
 TOKEN=properties["bot_token"]
 intents = discord.Intents.default()
@@ -32,27 +31,30 @@ class ServerGroup(app_commands.Group):
 
         await interaction.response.defer()
 
-        if not 1 < datetime.datetime.now().hour < 10:
+        if properties["guild_ids"][f"{interaction.guild.id}"] != "nikhef":
+            if not 1 < datetime.datetime.now().hour < 10:
 
-            match portcheck.status():
-                case "online":
-                    await interaction.followup.send("Server is already online")
+                match portcheck.status():
+                    case "online":
+                        await interaction.followup.send("Server is already online")
 
-                case "idling":
-                    await interaction.followup.send("Server is starting")
-                    portcheck.start(prot="idling")
+                    case "idling":
+                        await interaction.followup.send("Server is starting")
+                        portcheck.start(prot="idling")
 
-                case "sleeping":
-                    await interaction.followup.send("Server is waking up and starting.")
+                    case "sleeping":
+                        await interaction.followup.send("Server is waking up and starting.")
 
-                    portcheck.start(prot="sleeping")
+                        portcheck.start(prot="sleeping")
 
 
-                case "offline":
-                    await interaction.followup.send("Server is offline due to maintenance")
+                    case "offline":
+                        await interaction.followup.send("Server is offline due to maintenance")
 
+            else:
+                await interaction.followup.send("Ga eens slapen joh")
         else:
-            await interaction.followup.send("Ga eens slapen joh")
+            await interaction.followup.send("Undergoing some surgery, will be back soon.")
 
 
     @app_commands.command(description="Status checker for the server")
@@ -65,17 +67,24 @@ class ServerGroup(app_commands.Group):
         else:
             status = status_dict["offline"]
 
-
-        embed = discord.Embed(title="", description="", color=status[1])
-        embed.add_field(name="Server satus:", value=status[0])
+        if properties["guild_ids"][f"{interaction.guild.id}"] != "nikhef":
+            embed = discord.Embed(title="", description="", color=status[1])
+            embed.add_field(name="Server satus:", value=status[0])
+        else:
+            embed = discord.Embed(title="", description="", color=discord.Color.red())
+            embed.add_field(name="Server satus:", value="Current undergoing some surgery")
 
         await interaction.followup.send(embed=embed)
 
 
     @app_commands.command(description="retrieves the server IP")
     async def ip(self, interaction: discord.Interaction):
-        embed = discord.Embed(title="", description="", color=discord.Color.blurple())
-        embed.add_field(name="IP:", value="shieldbois.serveminecraft.net")
+        if properties["guild_ids"][f"{interaction.guild.id}"] == "nikhef":
+            embed = discord.Embed(title="", description="", color=discord.Color.blurple())
+            embed.add_field(name="IP:", value="Undergoing some surgery will be back someday")
+        else:
+            embed = discord.Embed(title="", description="", color=discord.Color.blurple())
+            embed.add_field(name="IP:", value="shieldbois.serveminecraft.net")
 
         await interaction.response.send_message(embed=embed)
 
