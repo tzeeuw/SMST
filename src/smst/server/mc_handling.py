@@ -14,9 +14,9 @@ with open('properties.json', 'r') as file:
     properties = json.load(file)
 
 IP = properties["local_server_ip"]
-PORT = properties["com_port"]
+PORT = int(properties["com_port"])
 BOT_IP = properties["local_bot_ip"]
-testing = True
+testing = False
 directory = properties["cwd"]
 command = properties["cmd"]
 TOKEN = properties["token"]
@@ -37,6 +37,7 @@ class mc_handling():
         """        
         self._server_is_alive = False
         self.server = mc_server(cmd=command, working_dir=directory)
+        self.MANUAL_STOP = False
 
         max_lines = 256
         self.lines = collections.deque([""]*max_lines)
