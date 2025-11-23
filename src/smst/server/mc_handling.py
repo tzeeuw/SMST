@@ -16,7 +16,7 @@ with open('properties.json', 'r') as file:
 IP = properties["local_server_ip"]
 PORT = int(properties["com_port"])
 BOT_IP = properties["local_bot_ip"]
-testing = True
+testing = False
 directory = properties["cwd"]
 command = properties["cmd"]
 TOKEN = properties["token"]
