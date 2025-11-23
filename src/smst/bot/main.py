@@ -3,13 +3,23 @@ from discord.ext import commands
 from discord import app_commands
 import datetime
 import json
+import socket
+from contextlib import closing
+import traceback
 
 import smst.com.port_check as portcheck
 
-with open('properties.json', 'r') as file:
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+
+with open(BASE_DIR / 'properties.json', 'r') as file:
     properties = json.load(file)
 GUILD_ID = [discord.Object(id=guild_id) for guild_id in properties["guild_ids"]]
 TOKEN=properties["bot_token"]
+PASSPHRASE=properties["token"]
+IP=properties["local_server_ip"]
+PORT=properties["com_port"]
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -92,12 +102,48 @@ class ServerGroup(app_commands.Group):
     @app_commands.command(name="whitelist", description="whitelist yourself to the server")
     async def ip(self, interaction: discord.Interaction, name: str):
 
-        await interaction.response.defer()
+        if properties["guild_ids"][f"{interaction.guild.id}"] == "nikhef":
+            await interaction.response.send_message("Soon")
 
-        await test_client.application_info().owner.send("test")
+        else:
+            await interaction.response.defer()
+        
+            app_info = await test_client.application_info()
+            user = interaction.user.name
+            guild = properties["guild_ids"][f"{interaction.guild.id}"]
+
+            # connect with terminal and send a whitelist request
+            try:
+                with closing(socket.socket()) as sock:
+                    sock.connect((IP, int(PORT)-1))
+                    sock.recv(1024).decode().strip()
+
+                    sock.send(PASSPHRASE.encode("utf-8"))
+
+                    # the remote shell sends two messages so recv them twice
+                    sock.recv(1024).decode().strip()
+                    sock.recv(1024).decode().strip()
+
+                    sock.send(f"whitelist add {name}".encode("utf-8"))
+
+                    sock.recv(1024).decode().strip()
+                    sock.send(b"exit")
+                    
+                    sock.close()
+
+                # send message to bot owner to ensure that every whitelist is documented
+                await app_info.owner.send(f"**{user}** added **{name}** to the whitelist of the **{guild}** minecraft server.")
+                await interaction.followup.send(f"Succesfully added: **{name}**, to the whitelist.")
+
+            
+            except Exception as e:
+                print(e)
+                print(traceback.format_exc())
+                # send message to bot owner to ensure that every whitelist is documented
+                await app_info.owner.send(f"**{user}** tried adding **{name}** to the whitelist of the **{guild}** minecraft server, but failed. Error: {e}")
+                await interaction.followup.send(f"Failed to add: **{name}**, to the whitelist.")
 
 
-        await interaction.followup.send(f"Succesfully added {name} to the whitelist.")
 
 
     # @app_commands.command(description="get modpack of the server")

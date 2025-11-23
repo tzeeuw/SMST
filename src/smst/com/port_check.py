@@ -4,7 +4,13 @@ from smst.com.wol import wake_server
 import threading
 import json
 
-with open('properties.json', 'r') as file:
+
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+
+
+with open(BASE_DIR / 'properties.json', 'r') as file:
     properties = json.load(file)
 
 
