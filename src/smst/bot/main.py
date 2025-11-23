@@ -84,7 +84,7 @@ class ServerGroup(app_commands.Group):
             embed.add_field(name="IP:", value="Undergoing some surgery will be back someday")
         else:
             embed = discord.Embed(title="", description="", color=discord.Color.blurple())
-            embed.add_field(name="IP:", value="je joden vader")
+            embed.add_field(name="IP:", value="shieldbois.serveminecraft.net")
 
         await interaction.response.send_message(embed=embed)
 
