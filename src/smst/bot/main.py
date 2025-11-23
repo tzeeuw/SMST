@@ -89,6 +89,17 @@ class ServerGroup(app_commands.Group):
         await interaction.response.send_message(embed=embed)
 
 
+    @app_commands.command(name="whitelist", description="whitelist yourself to the server")
+    async def ip(self, interaction: discord.Interaction, name: str):
+
+        await interaction.response.defer()
+
+        await test_client.application_info().owner.send("test")
+
+
+        await interaction.followup.send(f"Succesfully added {name} to the whitelist.")
+
+
     # @app_commands.command(description="get modpack of the server")
     # async def modpack(self, interaction: discord.Interaction):
     #     embed = discord.Embed(title="", description="", color=discord.Color.brand_green())
